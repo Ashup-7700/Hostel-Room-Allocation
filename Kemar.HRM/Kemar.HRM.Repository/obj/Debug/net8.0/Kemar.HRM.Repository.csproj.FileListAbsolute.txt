@@ -1,0 +1,17 @@
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\bin\Debug\net8.0\Kemar.HRM.Repository.deps.json
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\bin\Debug\net8.0\Kemar.HRM.Repository.runtimeconfig.json
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\bin\Debug\net8.0\Kemar.HRM.Repository.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\bin\Debug\net8.0\Kemar.HRM.Repository.pdb
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\bin\Debug\net8.0\Kemar.HRM.Model.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\bin\Debug\net8.0\Kemar.HRM.Model.pdb
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.csproj.AssemblyReference.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.AssemblyInfoInputs.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.AssemblyInfo.cs
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.csproj.CoreCompileInputs.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HR.BACC01A5.Up2Date
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\refint\Kemar.HRM.Repository.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.pdb
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\Kemar.HRM.Repository.genruntimeconfig.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Repository\obj\Debug\net8.0\ref\Kemar.HRM.Repository.dll

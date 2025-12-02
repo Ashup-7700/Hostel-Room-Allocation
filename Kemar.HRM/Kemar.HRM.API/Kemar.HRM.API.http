@@ -1,0 +1,6 @@
+@Kemar.HRM.API_HostAddress = http://localhost:5027
+
+GET {{Kemar.HRM.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

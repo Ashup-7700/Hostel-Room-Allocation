@@ -1,0 +1,14 @@
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\bin\Debug\net8.0\Kemar.HRM.Model.deps.json
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\bin\Debug\net8.0\Kemar.HRM.Model.runtimeconfig.json
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\bin\Debug\net8.0\Kemar.HRM.Model.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\bin\Debug\net8.0\Kemar.HRM.Model.pdb
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.csproj.AssemblyReference.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.AssemblyInfoInputs.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.AssemblyInfo.cs
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.csproj.CoreCompileInputs.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\refint\Kemar.HRM.Model.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.pdb
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\Kemar.HRM.Model.genruntimeconfig.cache
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.Model\obj\Debug\net8.0\ref\Kemar.HRM.Model.dll

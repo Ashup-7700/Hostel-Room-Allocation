@@ -1,0 +1,17 @@
+﻿namespace Kemar.HRM.Model.Response
+{
+    public class PaymentResponse
+    {
+        public int PaymentId { get; set; }
+        public int StudentId { get; set; }
+        public double Amount { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
+        public string PaymentType { get; set; } = string.Empty;
+        public DateTime PaymentDate { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public string? UpdatedBy { get; set; }
+    }
+}
