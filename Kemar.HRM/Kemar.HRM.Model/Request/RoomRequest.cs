@@ -4,6 +4,7 @@ namespace Kemar.HRM.Model.Request
 {
     public class RoomRequest
     {
+        public int RoomId { get; set; }
         [Required]
         [MaxLength(20)]
         public string? RoomNumber { get; set; }
@@ -23,5 +24,9 @@ namespace Kemar.HRM.Model.Request
         [Required]
         [Range(0, 100, ErrorMessage = "Current occupancy must be valid.")]
         public int CurrentOccupancy { get; set; }
+
+
+        public string? CreatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
     }
 }

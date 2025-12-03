@@ -1,4 +1,5 @@
-﻿using Kemar.HRM.Repository.Context;
+﻿using AutoMapper;
+using Kemar.HRM.Repository.Context;
 using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,12 @@ namespace Kemar.HRM.Repository.Repositories
     public class PaymentRepository : IPayment
     {
         private readonly HostelDbContext _context;
+        private readonly IMapper _mapper;
 
-        public PaymentRepository(HostelDbContext context)
+        public PaymentRepository(HostelDbContext context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Payment>> GetPaymentByStudent(int studentId)

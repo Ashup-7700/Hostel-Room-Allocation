@@ -1,6 +1,8 @@
-﻿using Kemar.HRM.Model.Request;
-using Kemar.HRM.Model.Response;
+﻿using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
 using Kemar.HRM.Repository.Interface;
+using System.Threading.Tasks;
 
 namespace Kemar.HRM.Business.StudentBusiness
 {
@@ -13,46 +15,48 @@ namespace Kemar.HRM.Business.StudentBusiness
             _repo = repo;
         }
 
-        public async Task<IEnumerable<StudentResponse>> GetAllAsync()
+        public async Task<ResultModel> AddOrUpdateAsync(StudentRequest request)
         {
-            var data = await _repo.GetAllAsync();
+            if (request == null)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid request");
 
-            foreach (var s in data)
-            {
-                s.Name = s.Name?.ToUpper();
-            }
+            if (string.IsNullOrWhiteSpace(request.Email))
+                return ResultModel.Failure(ResultCode.Invalid, "Email is required");
 
-            return data;
+            // Normalize email
+            request.Email = request.Email.Trim().ToLower();
+
+            var exists = await _repo.ExistsByEmailAsync(request.Email, request.StudentId);
+            if (exists)
+                return ResultModel.Failure(ResultCode.DuplicateRecord, "Email already exists");
+
+            return await _repo.AddOrUpdateAsync(request);
         }
 
-        public async Task<StudentResponse?> GetByIdAsync(int id)
+        public async Task<ResultModel> GetByIdAsync(int studentId)
         {
-            var data = await _repo.GetByIdAsync(id);
+            if (studentId <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid student id");
 
-            if (data != null)
-                Console.WriteLine("Student fetched successfully");
-
-            return data;
+            return await _repo.GetByIdAsync(studentId);
         }
 
-        public async Task<IEnumerable<StudentResponse>> GetByNameAsync(string name)
+        public async Task<ResultModel> GetByFilterAsync(StudentFilter filter)
         {
-            return await _repo.GetByNameAsync(name);
+            filter ??= new StudentFilter();
+            return await _repo.GetByFilterAsync(filter);
         }
 
-        public async Task<StudentResponse> CreateAsync(StudentRequest request)
+        public async Task<ResultModel> DeleteAsync(int studentId, string deletedBy = null)
         {
-            return await _repo.CreateAsync(request);
-        }
+            if (studentId <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid student id");
 
-        public async Task<StudentResponse?> UpdateAsync(int id, StudentRequest request)
-        {
-            return await _repo.UpdateAsync(id, request);
-        }
+            var result = await _repo.DeleteAsync(studentId, deletedBy);
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            return await _repo.DeleteAsync(id);
+            // ensure data is null for delete
+            result.Data = null;
+            return result;
         }
     }
 }

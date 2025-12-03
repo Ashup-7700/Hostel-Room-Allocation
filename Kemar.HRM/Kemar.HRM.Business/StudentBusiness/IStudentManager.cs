@@ -1,15 +1,15 @@
-﻿using Kemar.HRM.Model.Request;
-using Kemar.HRM.Model.Response;
+﻿using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
+using System.Threading.Tasks;
 
 namespace Kemar.HRM.Business.StudentBusiness
 {
     public interface IStudentManager
     {
-        Task<IEnumerable<StudentResponse>> GetAllAsync();
-        Task<StudentResponse?> GetByIdAsync(int id);
-        Task<IEnumerable<StudentResponse>> GetByNameAsync(string name);
-        Task<StudentResponse> CreateAsync(StudentRequest request);
-        Task<StudentResponse?> UpdateAsync(int id, StudentRequest request);
-        Task<bool> DeleteAsync(int id);
+        Task<ResultModel> AddOrUpdateAsync(StudentRequest request);
+        Task<ResultModel> GetByIdAsync(int studentId);
+        Task<ResultModel> GetByFilterAsync(StudentFilter filter);
+        Task<ResultModel> DeleteAsync(int studentId, string deletedBy = null);
     }
 }

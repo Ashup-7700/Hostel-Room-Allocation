@@ -5,310 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Room": {
-      "get": {
-        "tags": [
-          "Room"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Room"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Room/{id}": {
-      "get": {
-        "tags": [
-          "Room"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Room"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Room"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Room/available": {
-      "get": {
-        "tags": [
-          "Room"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/RoomAllocation/allocate": {
-      "post": {
-        "tags": [
-          "RoomAllocation"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomAllocationRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomAllocationRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/RoomAllocationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/RoomAllocation/free/{allocationId}": {
-      "put": {
-        "tags": [
-          "RoomAllocation"
-        ],
-        "parameters": [
-          {
-            "name": "allocationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/RoomAllocation": {
-      "get": {
-        "tags": [
-          "RoomAllocation"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/RoomAllocation/{id}": {
-      "get": {
-        "tags": [
-          "RoomAllocation"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "RoomAllocation"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/RoomAllocation/student/{studentId}": {
-      "get": {
-        "tags": [
-          "RoomAllocation"
-        ],
-        "parameters": [
-          {
-            "name": "studentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/RoomAllocation/room/{roomId}": {
-      "get": {
-        "tags": [
-          "RoomAllocation"
-        ],
-        "parameters": [
-          {
-            "name": "roomId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Student": {
-      "get": {
-        "tags": [
-          "Student"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
+    "/api/Student/addOrUpdate": {
       "post": {
         "tags": [
           "Student"
@@ -339,7 +36,7 @@
         }
       }
     },
-    "/api/Student/{id}": {
+    "/api/Student/getById/{id}": {
       "get": {
         "tags": [
           "Student"
@@ -360,37 +57,28 @@
             "description": "OK"
           }
         }
-      },
-      "put": {
+      }
+    },
+    "/api/Student/getByFilter": {
+      "post": {
         "tags": [
           "Student"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentRequest"
+                "$ref": "#/components/schemas/StudentFilter"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentRequest"
+                "$ref": "#/components/schemas/StudentFilter"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentRequest"
+                "$ref": "#/components/schemas/StudentFilter"
               }
             }
           }
@@ -400,7 +88,9 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/api/Student/delete/{id}": {
       "delete": {
         "tags": [
           "Student"
@@ -423,18 +113,104 @@
         }
       }
     },
-    "/api/Student/{name}": {
+    "/api/User/addOrUpdate": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/getById/{id}": {
       "get": {
         "tags": [
-          "Student"
+          "User"
         ],
         "parameters": [
           {
-            "name": "name",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/getByFilter": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserFilter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/delete/{id}": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -448,115 +224,179 @@
   },
   "components": {
     "schemas": {
-      "RoomAllocationRequest": {
-        "required": [
-          "allocationDate",
-          "roomId",
-          "studentId"
-        ],
+      "StudentFilter": {
         "type": "object",
         "properties": {
-          "studentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "roomId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "allocationDate": {
+          "name": {
             "type": "string",
-            "format": "date-time"
-          },
-          "checkoutDate": {
-            "type": "string",
-            "format": "date-time",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "RoomRequest": {
-        "required": [
-          "capacity",
-          "currentOccupancy",
-          "floor",
-          "roomNumber",
-          "roomType"
-        ],
-        "type": "object",
-        "properties": {
-          "roomNumber": {
-            "maxLength": 20,
-            "minLength": 1,
-            "type": "string"
           },
-          "roomType": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
+          "email": {
+            "type": "string",
+            "nullable": true
           },
-          "floor": {
-            "maximum": 100,
-            "minimum": 0,
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "page": {
             "type": "integer",
             "format": "int32"
           },
-          "capacity": {
-            "maximum": 100,
-            "minimum": 1,
+          "pageSize": {
             "type": "integer",
             "format": "int32"
           },
-          "currentOccupancy": {
-            "maximum": 100,
-            "minimum": 0,
-            "type": "integer",
-            "format": "int32"
+          "sortBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortDesc": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
       },
       "StudentRequest": {
         "required": [
-          "address",
           "dateOfAdmission",
           "email",
           "gender",
-          "name",
-          "phone"
+          "name"
         ],
         "type": "object",
         "properties": {
+          "studentId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "name": {
-            "maxLength": 25,
+            "maxLength": 100,
             "minLength": 1,
             "type": "string"
           },
           "gender": {
-            "maxLength": 8,
+            "maxLength": 10,
             "minLength": 1,
             "type": "string"
           },
           "phone": {
             "maxLength": 15,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "email": {
-            "maxLength": 25,
+            "maxLength": 120,
             "minLength": 1,
             "type": "string",
             "format": "email"
           },
           "address": {
             "maxLength": 200,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "dateOfAdmission": {
             "type": "string",
             "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "createdBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "updatedBy": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserFilter": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sortBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortDesc": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRequest": {
+        "required": [
+          "email",
+          "fullName"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "fullName": {
+            "maxLength": 150,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "mobileNo": {
+            "maxLength": 20,
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "createdBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "updatedBy": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

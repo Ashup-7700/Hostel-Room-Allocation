@@ -1,11 +1,14 @@
-﻿using Kemar.HRM.Business.StudentBusiness;
+﻿using Kemar.HRM.API.Helpers;
+using Kemar.HRM.Business.StudentBusiness;
+using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Kemar.HRM.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class StudentController : ControllerBase
     {
         private readonly IStudentManager _studentManager;
@@ -15,111 +18,38 @@ namespace Kemar.HRM.API.Controllers
             _studentManager = studentManager;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [HttpPost("addOrUpdate")]
+        public async Task<IActionResult> AddOrUpdate([FromBody] StudentRequest request)
         {
-            var data = await _studentManager.GetAllAsync();
-            return Ok(data);
+            if (!ModelState.IsValid)
+                return BadRequest(new { statusCode = 400, message = "Invalid data model" });
+
+            CommonHelper.SetUserInformation(ref request, request.StudentId ?? 0, HttpContext);
+
+            var result = await _studentManager.AddOrUpdateAsync(request);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("getById/{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _studentManager.GetByIdAsync(id);
-
-            if (result == null)
-                return NotFound("Student not found");
-
-            return Ok(result);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [HttpGet("{name}")]
-        public async Task<IActionResult> GetByName(string name)
+        [HttpPost("getByFilter")]
+        public async Task<IActionResult> GetByFilter([FromBody] StudentFilter filter)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return BadRequest("Name is required.");
-
-            var result = await _studentManager.GetByNameAsync(name);
-
-            if (!result.Any())
-                return NotFound("No students found with the given name.");
-
-            return Ok(result);
+            var result = await _studentManager.GetByFilterAsync(filter);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] StudentRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var created = await _studentManager.CreateAsync(request);
-
-            return Ok(created);
-        }
-
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] StudentRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var updated = await _studentManager.UpdateAsync(id, request);
-
-            if (updated == null)
-                return NotFound("Student not found");
-
-            return Ok(updated);
-        }
-
-        [HttpDelete("{id:int}")]
+        [HttpDelete("delete/{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _studentManager.DeleteAsync(id);
-
-            if (!deleted)
-                return NotFound("Student not found");
-
-            return Ok(new { message = "Student deleted successfully" });
+            var username = HttpContext.User?.Identity?.Name ?? "admin";
+            var result = await _studentManager.DeleteAsync(id, username);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// GET: api/student/with-allocations/5
-//[HttpGet("with-allocations/{id:int}")]
-//public async Task<IActionResult> GetWithAllocations(int id)
-//{
-//    var result = await _studentManager.GetStudentWithAllocations(id);
-
-//    if (result == null)
-//        return NotFound("Student not found");
-
-//    return Ok(result);
-//}
-
-//// GET: api/student/with-payments/5
-//[HttpGet("with-payments/{id:int}")]
-//public async Task<IActionResult> GetWithPayments(int id)
-//{
-//    var result = await _studentManager.GetStudentWithPayments(id);
-
-//    if (result == null)
-//        return NotFound("Student not found");
-
-//    return Ok(result);
-//}

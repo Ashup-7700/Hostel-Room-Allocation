@@ -1,31 +1,34 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kemar.HRM.Model.Request
 {
     public class StudentRequest
     {
-        [Required]
-        [MaxLength(25)]
-        public string? Name { get; set; }
+        public int? StudentId { get; set; }
 
-        [Required]
-        [MaxLength(8)]
-        public string? Gender { get; set; }
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = string.Empty;
 
-        [Required]
+        [Required, MaxLength(10)]
+        public string Gender { get; set; } = string.Empty;
+
         [MaxLength(15)]
-        public string? Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(25)]
-        [EmailAddress]
-        public string? Email { get; set; }
+        [Required, EmailAddress, MaxLength(120)]
+        public string Email { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(200)]
-        public string? Address { get; set; }
+        public string Address { get; set; } = string.Empty;
 
         [Required]
         public DateTime DateOfAdmission { get; set; }
+
+        public bool? IsActive { get; set; } = true;
+
+        // Audit fields — set by CommonHelper before calling manager
+        public string? CreatedBy { get; set; }
+        public string? UpdatedBy { get; set; }
     }
 }

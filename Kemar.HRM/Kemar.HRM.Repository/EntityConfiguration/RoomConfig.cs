@@ -1,5 +1,5 @@
 ﻿using Kemar.HRM.Repository.Entity;
-using Kemar.HRM.Repository.EntityConfiguration.Configurations.BaseConfigurations;
+using Kemar.HRM.Repository.EntityConfiguration.BaseConfigurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Kemar.HRM.Repository.EntityConfiguration

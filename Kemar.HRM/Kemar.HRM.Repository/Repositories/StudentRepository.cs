@@ -1,10 +1,16 @@
 ﻿using AutoMapper;
+using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Response;
 using Kemar.HRM.Repository.Context;
 using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Kemar.HRM.Repository.Repositories
 {
@@ -19,65 +25,132 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<StudentResponse>> GetAllAsync()
+        public async Task<ResultModel> AddOrUpdateAsync(StudentRequest request)
         {
-            var data = await _context.Students
-                .Include(s => s.Payments)
-                .Include(s => s.RoomAllocations)
-                .ToListAsync();
+            try
+            {
+                if (request.StudentId.HasValue && request.StudentId.Value > 0)
+                {
+                    // UPDATE
+                    var existing = await _context.Students
+                        .FirstOrDefaultAsync(s => s.StudentId == request.StudentId.Value);
 
-            return _mapper.Map<IEnumerable<StudentResponse>>(data);
+                    if (existing == null)
+                        return ResultModel.NotFound("Student not found");
+
+                    _mapper.Map(request, existing);
+
+                    existing.UpdatedAt = DateTime.UtcNow;
+                    if (!string.IsNullOrWhiteSpace(request.UpdatedBy))
+                        existing.UpdatedBy = request.UpdatedBy;
+
+                    await _context.SaveChangesAsync();
+
+                    // Return Updated code without data (per Option A behavior)
+                    return ResultModel.Updated(null, "Student updated successfully");
+                }
+                else
+                {
+                    // CREATE
+                    var entity = _mapper.Map<Student>(request);
+                    entity.CreatedAt = DateTime.UtcNow;
+                    entity.IsActive = request.IsActive ?? true;
+                    entity.CreatedBy = request.CreatedBy;
+
+                    _context.Students.Add(entity);
+                    await _context.SaveChangesAsync();
+
+                    return ResultModel.Created(null, "Student created successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.Message);
+            }
         }
 
-        public async Task<StudentResponse?> GetByIdAsync(int id)
+        public async Task<ResultModel> GetByIdAsync(int studentId)
         {
             var entity = await _context.Students
-                .Include(s => s.Payments)
-                .Include(s => s.RoomAllocations)
-                .FirstOrDefaultAsync(x => x.StudentId == id);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
 
-            return _mapper.Map<StudentResponse?>(entity);
+            if (entity == null)
+                return ResultModel.NotFound("Student not found");
+
+            var dto = _mapper.Map<StudentResponse>(entity);
+            return ResultModel.Success(dto, "Student data fetched successfully");
         }
 
-        public async Task<IEnumerable<StudentResponse>> GetByNameAsync(string name)
+        public async Task<ResultModel> GetByFilterAsync(StudentFilter filter)
         {
-            var data = await _context.Students
-                .Where(x => x.Name.Contains(name))
+            var query = _context.Students.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+                query = query.Where(s => s.Name.Contains(filter.Name));
+
+            if (!string.IsNullOrWhiteSpace(filter.Email))
+                query = query.Where(s => s.Email.Contains(filter.Email));
+
+            if (filter.IsActive.HasValue)
+                query = query.Where(s => s.IsActive == filter.IsActive.Value);
+
+            // Sorting
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
+            {
+                if (filter.SortBy.Equals("StudentId", StringComparison.OrdinalIgnoreCase))
+                    query = filter.SortDesc ? query.OrderByDescending(s => s.StudentId) : query.OrderBy(s => s.StudentId);
+                else if (filter.SortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                    query = filter.SortDesc ? query.OrderByDescending(s => s.Name) : query.OrderBy(s => s.Name);
+            }
+            else
+            {
+                query = query.OrderBy(s => s.StudentId);
+            }
+
+            var total = await query.CountAsync();
+            var items = await query
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Take(filter.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<StudentResponse>>(data);
+            var payload = new
+            {
+                Total = total,
+                Page = filter.Page,
+                PageSize = filter.PageSize,
+                Items = _mapper.Map<List<StudentResponse>>(items)
+            };
+
+            return ResultModel.Success(payload, "Student list fetched successfully");
         }
 
-        public async Task<StudentResponse> CreateAsync(StudentRequest request)
+        public async Task<bool> ExistsByEmailAsync(string email, int? excludingStudentId = null)
         {
-            var entity = _mapper.Map<Student>(request);
+            email = (email ?? string.Empty).Trim().ToLower();
 
-            _context.Students.Add(entity);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<StudentResponse>(entity);
+            return await _context.Students
+                .AnyAsync(s =>
+                    s.Email.Trim().ToLower() == email &&
+                    (excludingStudentId == null || s.StudentId != excludingStudentId.Value)
+                );
         }
 
-        public async Task<StudentResponse?> UpdateAsync(int id, StudentRequest request)
+        public async Task<ResultModel> DeleteAsync(int studentId, string deletedBy = null)
         {
-            var entity = await _context.Students.FindAsync(id);
-            if (entity == null) return null;
+            var existing = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
+            if (existing == null)
+                return ResultModel.NotFound("Student not found");
 
-            _mapper.Map(request, entity);
+            // Soft delete
+            existing.IsActive = false;
+            existing.UpdatedAt = DateTime.UtcNow;
+            if (!string.IsNullOrWhiteSpace(deletedBy))
+                existing.UpdatedBy = deletedBy;
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<StudentResponse>(entity);
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var entity = await _context.Students.FindAsync(id);
-            if (entity == null) return false;
-
-            _context.Students.Remove(entity);
-            await _context.SaveChangesAsync();
-            return true;
+            return ResultModel.Success(null, "Student deleted successfully");
         }
     }
 }

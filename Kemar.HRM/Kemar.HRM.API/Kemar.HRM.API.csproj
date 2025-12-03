@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Kemar.HRM.Business\Kemar.HRM.Business.csproj" />
     <ProjectReference Include="..\Kemar.HRM.Model\Kemar.HRM.Model.csproj" />
     <ProjectReference Include="..\Kemar.HRM.Repository\Kemar.HRM.Repository.csproj" />
+
   </ItemGroup>
 
 </Project>

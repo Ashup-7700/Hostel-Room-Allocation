@@ -4,8 +4,10 @@
     {
         public string? CreatedBy { get; set; }
         public string? UpdatedBy { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-        public bool Status { get; set; } = true;
+        public DateTime? UpdatedAt { get; set; }
+
+        public bool IsActive { get; set; } = true;   
     }
 }
