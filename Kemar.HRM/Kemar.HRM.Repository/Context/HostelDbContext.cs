@@ -7,8 +7,7 @@ namespace Kemar.HRM.Repository.Context
 {
     public class HostelDbContext : DbContext
     {
-        public HostelDbContext(DbContextOptions<HostelDbContext> options)
-            : base(options)
+        public HostelDbContext(DbContextOptions<HostelDbContext> options) : base(options)
         { }
 
         public DbSet<Student> Students { get; set; }
@@ -22,14 +21,13 @@ namespace Kemar.HRM.Repository.Context
         {
             base.OnModelCreating(modelBuilder);
 
-           
+
             modelBuilder.Entity<Student>().HasQueryFilter(s => s.IsActive);
             modelBuilder.Entity<User>().HasQueryFilter(u => u.IsActive);
 
-         
             modelBuilder.ApplyConfiguration(new StudentConfig());
             modelBuilder.ApplyConfiguration(new RoomConfig());
-            //modelBuilder.ApplyConfiguration(new RoomAllocationConfig());
+            modelBuilder.ApplyConfiguration(new RoomAllocationConfig());
             modelBuilder.ApplyConfiguration(new PaymentConfig());
             modelBuilder.ApplyConfiguration(new FeeStructureConfig());
             modelBuilder.ApplyConfiguration(new UserConfig());
@@ -54,10 +52,9 @@ namespace Kemar.HRM.Repository.Context
                 if (entry.State == EntityState.Added)
                 {
                     entry.Entity.CreatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedAt = null; 
+                    entry.Entity.UpdatedAt = null;
                     entry.Entity.IsActive = true;
 
-                   
                     entry.Entity.CreatedBy ??= "system";
                     entry.Entity.UpdatedBy ??= null;
                 }
@@ -68,7 +65,7 @@ namespace Kemar.HRM.Repository.Context
                 }
                 else if (entry.State == EntityState.Deleted)
                 {
-                    
+
                     entry.State = EntityState.Modified;
                     entry.Entity.IsActive = false;
                     entry.Entity.UpdatedAt = DateTime.UtcNow;

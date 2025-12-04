@@ -11,8 +11,8 @@ namespace Kemar.HRM.Repository.Entity
 
         public decimal Amount { get; set; }
 
-        public string PaymentMethod { get; set; } = string.Empty; // UPI, Cash, Card
-        public string PaymentType { get; set; } = string.Empty;   // Monthly Rent / Security Deposit
+        public string PaymentMethod { get; set; } = string.Empty;
+        public string PaymentType { get; set; } = string.Empty;
 
         public DateTime PaymentDate { get; set; }
     }

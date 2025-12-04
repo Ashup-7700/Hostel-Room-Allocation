@@ -4,14 +4,15 @@ namespace Kemar.HRM.Model.Request
 {
     public class RoomRequest
     {
-        public int RoomId { get; set; }
+        public int? RoomId { get; set; }
+
         [Required]
         [MaxLength(20)]
-        public string? RoomNumber { get; set; }
+        public string RoomNumber { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(50)]
-        public string? RoomType { get; set; }
+        public string RoomType { get; set; } = string.Empty;
 
         [Required]
         [Range(0, 100, ErrorMessage = "Floor must be valid.")]
@@ -21,12 +22,12 @@ namespace Kemar.HRM.Model.Request
         [Range(1, 100, ErrorMessage = "Capacity must be at least 1.")]
         public int Capacity { get; set; }
 
-        [Required]
-        [Range(0, 100, ErrorMessage = "Current occupancy must be valid.")]
-        public int CurrentOccupancy { get; set; }
 
+        [Range(0, 100, ErrorMessage = "Current occupancy must be valid.")]
+        public int CurrentOccupancy { get; set; } = 0;
 
         public string? CreatedBy { get; set; }
         public string? UpdatedBy { get; set; }
+
     }
 }

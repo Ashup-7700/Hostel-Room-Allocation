@@ -1,152 +1,61 @@
-﻿//using Kemar.HRM.Model.Request;
-//using Kemar.HRM.Model.Response;
-//using Kemar.HRM.Repository.Interface;
-//using Kemar.HRM.Repository.Entity;
+﻿using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
+using Kemar.HRM.Repository.Interface;
 
-//namespace Kemar.HRM.Business.RoomAllocationBusiness
-//{
-//    public class RoomAllocationManager : IRoomAllocationManager
-//    {
-//        private readonly IRoomAllocation _allocationRepo;
-//        private readonly IStudent _studentRepo;
-//        private readonly IRoom _roomRepo;
+namespace Kemar.HRM.Business.RoomAllocationBusiness
+{
+    public class RoomAllocationManager : IRoomAllocationManager
+    {
+        private readonly IRoomAllocation _repo;
 
-//        public RoomAllocationManager(IRoomAllocation allocationRepo, IStudent studentRepo, IRoom roomRepo)
-//        {
-//            _allocationRepo = allocationRepo;
-//            _studentRepo = studentRepo;
-//            _roomRepo = roomRepo;
-//        }
+        public RoomAllocationManager(IRoomAllocation repo)
+        {
+            _repo = repo;
+        }
 
-//        public async Task<RoomAllocationResponse> AllocateRoomAsync(RoomAllocationRequest request)
-//        {
-//            var student = await _studentRepo.GetByIdAsync(request.StudentId);
-//            if (student == null)
-//                throw new Exception("Student not found");
+        public async Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request)
+        {
+            if (request == null)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid request");
 
-//            var room = await _roomRepo.GetByIdAsync(request.RoomId);
-//            if (room == null)
-//                throw new Exception("Room not found");
+            if (request.StudentId <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "StudentId is required");
 
-//            if (room.CurrentOccupancy >= room.Capacity)
-//                throw new Exception("Room is full");
+            if (request.RoomId <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "RoomId is required");
 
-//            var allocation = new RoomAllocation
-//            {
-//                StudentId = request.StudentId,
-//                RoomId = request.RoomId,
-//                AllocationDate = request.AllocationDate,
-//                CheckoutDate = request.CheckoutDate
-//            };
+            if (request.AllocatedAt == default)
+                return ResultModel.Failure(ResultCode.Invalid, "AllocatedAt is required");
 
-//            var created = await _allocationRepo.CreateAsync(allocation);
+            var exists = await _repo.ExistsActiveAllocationAsync(request.StudentId, request.RoomId);
+            if (exists && (!request.RoomAllocationId.HasValue || request.RoomAllocationId.Value == 0))
+                return ResultModel.Failure(ResultCode.DuplicateRecord, "Active allocation already exists for this student in this room");
 
-//            room.CurrentOccupancy++;
-//            await _roomRepo.UpdateAsync(room.RoomId, new()
-//            {
-//                RoomNumber = room.RoomNumber,
-//                RoomType = room.RoomType,
-//                Floor = room.Floor,
-//                Capacity = room.Capacity,
-//                CurrentOccupancy = room.CurrentOccupancy
-//            });
+            return await _repo.AddOrUpdateAsync(request);
+        }
 
-//            return ToResponse(created);
-//        }
+        public async Task<ResultModel> GetByIdAsync(int allocationId)
+        {
+            if (allocationId <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid allocation id");
 
-//        public async Task<RoomAllocationResponse> FreeRoomAsync(int allocationId)
-//        {
-//            var allocation = await _allocationRepo.GetByIdAsync(allocationId);
-//            if (allocation == null)
-//                throw new Exception("Allocation not found");
+            return await _repo.GetByIdAsync(allocationId);
+        }
 
-//            var room = await _roomRepo.GetByIdAsync(allocation.RoomId);
-//            if (room == null)
-//                throw new Exception("Room not found");
+        public async Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter)
+        {
+            filter ??= new RoomAllocationFilter();
+            return await _repo.GetByFilterAsync(filter);
+        }
 
-//            if (room.CurrentOccupancy > 0)
-//                room.CurrentOccupancy--;
+        public async Task<ResultModel> DeleteAsync(int allocationId, string deletedBy = null)
+        {
+            if (allocationId <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid allocation id");
 
-//            allocation.CheckoutDate = DateTime.Now;
-//            await _allocationRepo.UpdateAsync(allocation);
+            return await _repo.DeleteAsync(allocationId, deletedBy);
 
-//            await _roomRepo.UpdateAsync(room.RoomId, new()
-//            {
-//                RoomNumber = room.RoomNumber,
-//                RoomType = room.RoomType,
-//                Floor = room.Floor,
-//                Capacity = room.Capacity,
-//                CurrentOccupancy = room.CurrentOccupancy
-//            });
-
-//            return ToResponse(allocation);
-//        }
-
-//        public async Task<IEnumerable<RoomAllocationResponse>> GetByStudentAsync(int studentId)
-//        {
-//            var records = await _allocationRepo.GetAllocationsByStudent(studentId);
-//            return records.Select(x => ToResponse(x));
-//        }
-
-//        public async Task<IEnumerable<RoomAllocationResponse>> GetByRoomAsync(int roomId)
-//        {
-//            var records = await _allocationRepo.GetAllocationsByRoom(roomId);
-//            return records.Select(x => ToResponse(x));
-//        }
-
-//        public async Task<RoomAllocationResponse?> GetByIdAsync(int id)
-//        {
-//            var entity = await _allocationRepo.GetByIdAsync(id);
-//            return entity == null ? null : ToResponse(entity);
-//        }
-
-//        public async Task<IEnumerable<RoomAllocationResponse>> GetAllAsync()
-//        {
-//            var list = await _allocationRepo.GetAllAsync();
-//            return list.Select(x => ToResponse(x));
-//        }
-
-
-//        public async Task<bool> DeleteAsync(int id)   
-//        {
-//            return await _allocationRepo.DeleteAsync(id);
-//        }
-        
-//        private RoomAllocationResponse ToResponse(RoomAllocation entity)
-//        {
-//            return new RoomAllocationResponse
-//            {
-//                RoomAllocationId = entity.RoomAllocationId,
-//                StudentId = entity.StudentId,
-//                RoomId = entity.RoomId,
-//                AllocationDate = entity.AllocationDate,
-//                CheckoutDate = entity.CheckoutDate,
-//                CreatedAt = entity.CreatedAt,
-//                CreatedBy = entity.CreatedBy,
-//                UpdatedAt = entity.UpdatedAt,
-//                UpdatedBy = entity.UpdatedBy,
-
-//                Student = entity.Student == null ? null : new StudentResponse
-//                {
-//                    StudentId = entity.Student.StudentId,
-//                    Name = entity.Student.Name,
-//                    Gender = entity.Student.Gender,
-//                    Email = entity.Student.Email,
-//                    Phone = entity.Student.Phone,
-//                    Address = entity.Student.Address,
-//                    DateOfAdmission = entity.Student.DateOfAdmission
-//                },
-
-//                Room = entity.Room == null ? null : new RoomResponse
-//                {
-//                    RoomId = entity.Room.RoomId,
-//                    RoomNumber = entity.Room.RoomNumber,
-//                    RoomType = entity.Room.RoomType,
-//                    Floor = entity.Room.Floor,
-//                    Capacity = entity.Room.Capacity,
-//                    CurrentOccupancy = entity.Room.CurrentOccupancy
-//                }
-//            };
-//        }
-//    }
-//}
+        }
+    }
+}

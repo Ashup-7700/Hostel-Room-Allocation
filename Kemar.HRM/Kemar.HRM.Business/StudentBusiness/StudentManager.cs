@@ -2,7 +2,6 @@
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Repository.Interface;
-using System.Threading.Tasks;
 
 namespace Kemar.HRM.Business.StudentBusiness
 {
@@ -23,7 +22,6 @@ namespace Kemar.HRM.Business.StudentBusiness
             if (string.IsNullOrWhiteSpace(request.Email))
                 return ResultModel.Failure(ResultCode.Invalid, "Email is required");
 
-            // Normalize email
             request.Email = request.Email.Trim().ToLower();
 
             var exists = await _repo.ExistsByEmailAsync(request.Email, request.StudentId);
@@ -54,9 +52,9 @@ namespace Kemar.HRM.Business.StudentBusiness
 
             var result = await _repo.DeleteAsync(studentId, deletedBy);
 
-            // ensure data is null for delete
             result.Data = null;
             return result;
+
         }
     }
 }

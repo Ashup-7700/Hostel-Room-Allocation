@@ -1,64 +1,60 @@
-﻿//using Kemar.HRM.Business.RoomAllocationBusiness;
-//using Kemar.HRM.Model.Request;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Kemar.HRM.API.Helpers;
+using Kemar.HRM.Business.RoomAllocationBusiness;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace Kemar.HRM.API.Controllers
-//{
-//    [ApiController]
-//    [Route("api/[controller]")]
-//    public class RoomAllocationController : ControllerBase
-//    {
-//        private readonly IRoomAllocationManager _manager;
+namespace Kemar.HRM.API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class RoomAllocationController : ControllerBase
+    {
+        private readonly IRoomAllocationManager _manager;
 
-//        public RoomAllocationController(IRoomAllocationManager manager)
-//        {
-//            _manager = manager;
-//        }
+        public RoomAllocationController(IRoomAllocationManager manager)
+        {
+            _manager = manager;
+        }
 
-//        [HttpPost("allocate")]
-//        public async Task<IActionResult> AllocateRoom(RoomAllocationRequest request)
-//        {
-//            var result = await _manager.AllocateRoomAsync(request);
-//            return Ok(result);
-//        }
+        [HttpPost("addOrUpdate")]
+        public async Task<IActionResult> AddOrUpdate([FromBody] RoomAllocationRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { statusCode = 400, message = "Invalid data model" });
 
-//        [HttpPut("free/{allocationId}")]
-//        public async Task<IActionResult> FreeRoom(int allocationId)
-//        {
-//            var result = await _manager.FreeRoomAsync(allocationId);
-//            return Ok(result);
-//        }
+            CommonHelper.SetUserInformation(ref request, request.RoomAllocationId ?? 0, HttpContext);
 
-//        [HttpGet]
-//        public async Task<IActionResult> GetAll()
-//        {
-//            return Ok(await _manager.GetAllAsync());
-//        }
+            if (!request.AllocatedByUserId.HasValue)
+            {
 
-//        [HttpGet("{id}")]
-//        public async Task<IActionResult> Get(int id)
-//        {
-//            var record = await _manager.GetByIdAsync(id);
-//            return record == null ? NotFound() : Ok(record);
-//        }
+            }
 
-//        [HttpGet("student/{studentId}")]
-//        public async Task<IActionResult> GetByStudent(int studentId)
-//        {
-//            return Ok(await _manager.GetByStudentAsync(studentId));
-//        }
+            var result = await _manager.AddOrUpdateAsync(request);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
+        }
 
-//        [HttpGet("room/{roomId}")]
-//        public async Task<IActionResult> GetByRoom(int roomId)
-//        {
-//            return Ok(await _manager.GetByRoomAsync(roomId));
-//        }
+        [HttpGet("getById/{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _manager.GetByIdAsync(id);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
+        }
 
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> Delete(int id)
-//        {
-//            var deleted = await _manager.DeleteAsync(id);
-//            return deleted ? Ok("Deleted successfully") : NotFound();
-//        }
-//    }
-//}
+        [HttpPost("getByFilter")]
+        public async Task<IActionResult> GetByFilter([FromBody] RoomAllocationFilter filter)
+        {
+            var result = await _manager.GetByFilterAsync(filter);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
+        }
+
+        [HttpDelete("delete/{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var username = HttpContext.User?.Identity?.Name ?? "admin";
+            var result = await _manager.DeleteAsync(id, username);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
+
+        }
+    }
+}

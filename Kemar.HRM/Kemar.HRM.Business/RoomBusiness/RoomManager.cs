@@ -1,5 +1,6 @@
-﻿using Kemar.HRM.Model.Request;
-using Kemar.HRM.Model.Response;
+﻿using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
 using Kemar.HRM.Repository.Interface;
 
 namespace Kemar.HRM.Business.RoomBusiness
@@ -13,45 +14,30 @@ namespace Kemar.HRM.Business.RoomBusiness
             _repo = repo;
         }
 
-        public Task<IEnumerable<RoomResponse>> GetAllAsync()
-            => _repo.GetAllAsync();
-
-        public Task<RoomResponse?> GetByIdAsync(int id)
-            => _repo.GetByIdAsync(id);
-
-        public Task<IEnumerable<RoomResponse>> GetAvailableRoomAsync()
-            => _repo.GetAvailableRoomAsync();
-
-        public Task<RoomResponse> CreateAsync(RoomRequest request)
-            => _repo.CreateAsync(request);
-
-        public Task<RoomResponse> UpdateAsync(int id, RoomRequest request)
-            => _repo.UpdateAsync(id, request);
-
-        public Task<bool> DeleteAsync(int id)
-            => _repo.DeleteAsync(id);
-
-
-
-        public async Task<bool> AllocateRoomAsync(int StudentId,int roomId)
+        public async Task<ResultModel> AddOrUpdateAsync(RoomRequest request)
         {
-            var result = await _repo.GetByIdAsync(roomId);
-            if(result == null) return false;
+            if (string.IsNullOrWhiteSpace(request.RoomNumber))
+                return ResultModel.Failure(ResultCode.Invalid, "Room Number is required");
 
-            if(result.CurrentOccupancy >= result.Capacity) return false;
+            var exists = await _repo.ExistsByRoomNumberAsync(
+                request.RoomNumber,
+                request.RoomId
+            );
 
-            return await _repo.IncreaseOccupancyAsync(roomId);
+            if (exists)
+                return ResultModel.Failure(ResultCode.DuplicateRecord, "Room number already exists");
+
+            return await _repo.AddOrUpdateAsync(request);
         }
 
-        public async Task<bool> FreeRoomAsync(int studentId, int roomId)
-        {
-            var result = await _repo.GetByIdAsync(roomId);
-            if(result == null) return false;
+        public Task<ResultModel> DeleteAsync(int roomId, string deleteBy)
+            => _repo.DeleteAsync(roomId, deleteBy);
 
-            if(result.CurrentOccupancy <= 0)
-                return false;
+        public Task<ResultModel> GetByFilterAsync(RoomFilter filter)
+            => _repo.GetByFilterAsync(filter);
 
-            return await _repo.DecreaseOccupancyAsync(roomId);
-        }
-    } 
+        public Task<ResultModel> GetByIdAsync(int roomId)
+            => _repo.GetByIdAsync(roomId);
+
+    }
 }

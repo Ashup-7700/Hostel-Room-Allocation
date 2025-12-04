@@ -1,10 +1,11 @@
 ﻿using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.EntityConfiguration.BaseConfigurations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Kemar.HRM.Repository.EntityConfiguration
 {
-    internal class RoomConfig : BaseEntityConfig<Room>
+    internal class RoomConfig : BaseEntityConfig<Room>, IEntityTypeConfiguration<Room>
     {
         public override void Configure(EntityTypeBuilder<Room> builder)
         {
@@ -17,9 +18,7 @@ namespace Kemar.HRM.Repository.EntityConfiguration
             builder.Property(r => r.Capacity).IsRequired();
             builder.Property(r => r.CurrentOccupancy).IsRequired();
 
-            builder.HasMany(r => r.RoomAllocations)
-                   .WithOne(ra => ra.Room)
-                   .HasForeignKey(ra => ra.RoomId);
+            builder.HasMany(r => r.RoomAllocations).WithOne(ra => ra.Room).HasForeignKey(ra => ra.RoomId).OnDelete(DeleteBehavior.Restrict);
 
         }
     }

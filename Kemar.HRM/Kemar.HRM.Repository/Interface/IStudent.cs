@@ -1,7 +1,6 @@
 ﻿using Kemar.HRM.Model.Common;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
-using System.Threading.Tasks;
 
 namespace Kemar.HRM.Repository.Interface
 {
@@ -12,5 +11,6 @@ namespace Kemar.HRM.Repository.Interface
         Task<ResultModel> GetByFilterAsync(StudentFilter filter);
         Task<bool> ExistsByEmailAsync(string email, int? excludingStudentId = null);
         Task<ResultModel> DeleteAsync(int studentId, string deletedBy = null);
+
     }
 }

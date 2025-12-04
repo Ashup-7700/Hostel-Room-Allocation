@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Kemar.HRM.Model.Response
+﻿namespace Kemar.HRM.Model.Response
 {
     public class StudentResponse
     {
@@ -17,5 +15,6 @@ namespace Kemar.HRM.Model.Response
         public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string? UpdatedBy { get; set; }
+
     }
 }

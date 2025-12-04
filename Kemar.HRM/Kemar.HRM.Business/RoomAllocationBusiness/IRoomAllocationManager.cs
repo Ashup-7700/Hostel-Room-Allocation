@@ -1,17 +1,15 @@
-﻿using Kemar.HRM.Model.Request;
-using Kemar.HRM.Model.Response;
+﻿using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
 
 namespace Kemar.HRM.Business.RoomAllocationBusiness
 {
     public interface IRoomAllocationManager
     {
-        Task<RoomAllocationResponse> AllocateRoomAsync(RoomAllocationRequest request);
-        Task<RoomAllocationResponse> FreeRoomAsync(int allocationId);
+        Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request);
+        Task<ResultModel> GetByIdAsync(int allocationId);
+        Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter);
+        Task<ResultModel> DeleteAsync(int allocationId, string deletedBy = null);
 
-        Task<IEnumerable<RoomAllocationResponse>> GetByStudentAsync(int studentId);
-        Task<IEnumerable<RoomAllocationResponse>> GetByRoomAsync(int roomId);
-        Task<RoomAllocationResponse?> GetByIdAsync(int id);
-        Task<IEnumerable<RoomAllocationResponse>> GetAllAsync();
-        Task<bool> DeleteAsync(int id);
     }
 }

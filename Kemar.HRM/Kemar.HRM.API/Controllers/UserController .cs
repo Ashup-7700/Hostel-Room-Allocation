@@ -46,10 +46,11 @@ namespace Kemar.HRM.API.Controllers
         [HttpDelete("delete/{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            CommonHelper.SetUserInformation(ref id, id, HttpContext); 
+            CommonHelper.SetUserInformation(ref id, id, HttpContext);
             var username = HttpContext.User?.Identity?.Name ?? "admin";
             var result = await _userManager.DeleteAsync(id, username);
             return CommonHelper.ReturnActionResultByStatus(result, this);
+
         }
     }
 }

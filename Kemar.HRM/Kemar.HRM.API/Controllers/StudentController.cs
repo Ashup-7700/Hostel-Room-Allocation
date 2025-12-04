@@ -3,7 +3,6 @@ using Kemar.HRM.Business.StudentBusiness;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Kemar.HRM.API.Controllers
 {
@@ -50,6 +49,7 @@ namespace Kemar.HRM.API.Controllers
             var username = HttpContext.User?.Identity?.Name ?? "admin";
             var result = await _studentManager.DeleteAsync(id, username);
             return CommonHelper.ReturnActionResultByStatus(result, this);
+
         }
     }
 }

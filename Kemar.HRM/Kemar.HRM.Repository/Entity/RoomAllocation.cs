@@ -12,7 +12,6 @@ namespace Kemar.HRM.Repository.Entity
         public int RoomId { get; set; }
         public Room? Room { get; set; }
 
-        // link to user who allocated
         public int AllocatedByUserId { get; set; }
         public User? AllocatedBy { get; set; }
 

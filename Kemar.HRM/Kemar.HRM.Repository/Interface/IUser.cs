@@ -11,5 +11,6 @@ namespace Kemar.HRM.Repository.Interface
         Task<ResultModel> GetByFilterAsync(UserFilter filter);
         Task<bool> ExistsByEmailAsync(string email, int? excludingUserId = null);
         Task<ResultModel> DeleteAsync(int userId, string deletedBy = null);
+
     }
 }

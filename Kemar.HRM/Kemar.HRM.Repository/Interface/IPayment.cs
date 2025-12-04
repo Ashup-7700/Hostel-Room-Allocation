@@ -1,16 +1,15 @@
-﻿using Kemar.HRM.Repository.Entity;
+﻿using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
 
 namespace Kemar.HRM.Repository.Interface
 {
     public interface IPayment
     {
-        Task<IEnumerable<Payment>> GetPaymentByStudent(int studentId);
-        Task<double> GetTotalPaidAmountAsync(int studentId);
-        Task<Payment> CreateAsync(Payment entity);
-        Task<Payment?> UpdateAsync(Payment entity);
-        Task<bool> DeleteAsync(int id);
-        Task<Payment?> GetByIdAsync(int id);
-        Task<IEnumerable<Payment>> GetAllAsync();
+        Task<ResultModel> AddOrUpdateAsync(PaymentRequest request);
+        Task<ResultModel> GetByIdAsync(int paymentId);
+        Task<ResultModel> GetByFilterAsync(PaymentFilter filter);
+        Task<ResultModel> DeleteAsync(int paymentId, string deletedBy);
 
     }
 }

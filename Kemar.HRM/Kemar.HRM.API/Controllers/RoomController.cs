@@ -1,72 +1,54 @@
-﻿//using Kemar.HRM.Business.RoomBusiness;
-//using Kemar.HRM.Model.Request;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Kemar.HRM.API.Helpers;
+using Kemar.HRM.Business.RoomBusiness;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace Kemar.HRM.API.Controllers
-//{
-//    [ApiController]
-//    [Route("api/[controller]")]
-//    public class RoomController : ControllerBase
-//    {
-//        private readonly IRoomManager _roomManager;
+namespace Kemar.HRM.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class RoomController : ControllerBase
+    {
+        private readonly IRoomManager _manager;
 
-//        public RoomController(IRoomManager roomManager)
-//        {
-//            _roomManager = roomManager;
-//        }
+        public RoomController(IRoomManager manager)
+        {
+            _manager = manager;
+        }
 
-//        [HttpGet]
-//        public async Task<IActionResult> GetAll()
-//        {
-//            return Ok(await _roomManager.GetAllAsync());
-//        }
+        [HttpPost("addOrUpdate")]
+        public async Task<IActionResult> AddOrUpdate([FromBody] RoomRequest request)
+        {
+            CommonHelper.SetUserInformation(ref request, request.RoomId ?? 0, HttpContext);
 
-//        [HttpGet("{id}")]
-//        public async Task<IActionResult> GetById(int id)
-//        {
-//            var result = await _roomManager.GetByIdAsync(id);   
-//            if(result == null) return NotFound();
-//            return Ok(result);
+            var result = await _manager.AddOrUpdateAsync(request);
+            return CommonHelper.ReturnActionResultByStatus(result,this);
+        }
 
-//        }
+        [HttpGet("getById/{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _manager.GetByIdAsync(id);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
+        }
 
-//        [HttpGet("available")]
-//        public async Task<IActionResult> GetAvailable()
-//        {
-//            return Ok(await _roomManager.GetAvailableRoomAsync());
-//        }
+        [HttpPost("getByFilter")] 
+        public async Task<IActionResult> GetByFilter([FromBody] RoomFilter filter)
+        {
+            var result = await _manager.GetByFilterAsync(filter);
+            return CommonHelper.ReturnActionResultByStatus(result,this) ;
+        }
 
-//        [HttpPost]
-//        public async Task<IActionResult> Create(RoomRequest request)
-//        {
-//            var result = await _roomManager.CreateAsync(request);
-//            return Ok(result);
-//        }
+        [HttpDelete("delete/{id:int}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var username = HttpContext.User?.Identity?.Name ?? "admin";
 
-//        [HttpPut("{id}")]
-//        public async Task<IActionResult> Update(int id, RoomRequest request)
-//        {
-//            var result = await _roomManager.UpdateAsync(id,request);
-//            if(result == null) return NotFound();
-//            return Ok(result);
-//        }
+            var result = await _manager.DeleteAsync(id, username);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
 
-//        [HttpDelete("{id}")]
-//        public async Task<IActionResult> Delete(int id)
-//        {
-//            return Ok(await _roomManager.DeleteAsync(id));
-//        }
+        }
+    }
 
-//        //[HttpPost("allocation")]
-//        //public async Task<IActionResult> Allocate(int studentId, int roomId)
-//        //{
-//        //    return Ok(await _roomManager.AllocateRoomAsync(studentId, roomId));
-//        //}
-
-//        //[HttpPost("free")]
-//        //public async Task<IActionResult> Free(int studentId, int roomId)
-//        //{
-//        //    return Ok(await _roomManager.FreeRoomAsync(studentId, roomId));
-//        //}
-//    }
-//}
+}

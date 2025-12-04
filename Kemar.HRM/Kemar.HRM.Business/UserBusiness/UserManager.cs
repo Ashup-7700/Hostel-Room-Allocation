@@ -3,7 +3,6 @@ using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Repository.Interface;
 
-
 namespace Kemar.HRM.Business.UserBusiness
 {
     public class UserManager : IUserManager
@@ -23,7 +22,7 @@ namespace Kemar.HRM.Business.UserBusiness
             if (string.IsNullOrWhiteSpace(request.Email))
                 return ResultModel.Failure(ResultCode.Invalid, "Email is required");
 
-           
+
             request.Email = request.Email.Trim().ToLower();
 
             var exists = await _userRepo.ExistsByEmailAsync(
@@ -57,6 +56,7 @@ namespace Kemar.HRM.Business.UserBusiness
                 return ResultModel.Failure(ResultCode.Invalid, "Invalid user id");
 
             return await _userRepo.DeleteAsync(userId, deletedBy);
+
         }
     }
 }

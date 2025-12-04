@@ -1,5 +1,261 @@
 [
   {
+    "ContainingType": "Kemar.HRM.API.Controllers.FeeStructureController",
+    "Method": "GetByIdAsync",
+    "RelativePath": "api/FeeStructure/{feeStructureId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "feeStructureId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.FeeStructureController",
+    "Method": "DeleteAsync",
+    "RelativePath": "api/FeeStructure/{feeStructureId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "feeStructureId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.FeeStructureController",
+    "Method": "AddOrUpdateAsync",
+    "RelativePath": "api/FeeStructure/addOrUpdate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Kemar.HRM.Model.Request.FeeStructureRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.FeeStructureController",
+    "Method": "GetByFilterAsync",
+    "RelativePath": "api/FeeStructure/filter",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "Kemar.HRM.Model.Filter.FeeStructureFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
+    "Method": "GetByIdAsync",
+    "RelativePath": "api/Payment/{paymentId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "paymentId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
+    "Method": "DeleteAsync",
+    "RelativePath": "api/Payment/{paymentId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "paymentId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
+    "Method": "AddOrUpdateAsync",
+    "RelativePath": "api/Payment/addOrUpdate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Kemar.HRM.Model.Request.PaymentRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
+    "Method": "GetByFilterAsync",
+    "RelativePath": "api/Payment/filter",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "Kemar.HRM.Model.Filter.PaymentFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomController",
+    "Method": "AddOrUpdate",
+    "RelativePath": "api/Room/addOrUpdate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Kemar.HRM.Model.Request.RoomRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomController",
+    "Method": "Delete",
+    "RelativePath": "api/Room/delete/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomController",
+    "Method": "GetByFilter",
+    "RelativePath": "api/Room/getByFilter",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "Kemar.HRM.Model.Filter.RoomFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomController",
+    "Method": "GetById",
+    "RelativePath": "api/Room/getById/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
+    "Method": "AddOrUpdate",
+    "RelativePath": "api/RoomAllocation/addOrUpdate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Kemar.HRM.Model.Request.RoomAllocationRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
+    "Method": "Delete",
+    "RelativePath": "api/RoomAllocation/delete/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
+    "Method": "GetByFilter",
+    "RelativePath": "api/RoomAllocation/getByFilter",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "Kemar.HRM.Model.Filter.RoomAllocationFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
+    "Method": "GetById",
+    "RelativePath": "api/RoomAllocation/getById/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Kemar.HRM.API.Controllers.StudentController",
     "Method": "AddOrUpdate",
     "RelativePath": "api/Student/addOrUpdate",

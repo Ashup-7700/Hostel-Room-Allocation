@@ -1,19 +1,16 @@
-﻿using Kemar.HRM.Model.Request;
-using Kemar.HRM.Model.Response;
+﻿using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
+using Kemar.HRM.Model.Request;
 
 namespace Kemar.HRM.Repository.Interface
 {
     public interface IRoom
     {
-        Task<IEnumerable<RoomResponse>> GetAllAsync();
-        Task<RoomResponse?> GetByIdAsync(int id);
-        Task<IEnumerable<RoomResponse>> GetAvailableRoomAsync();
+        Task<ResultModel> AddOrUpdateAsync(RoomRequest request);
+        Task<ResultModel> GetByIdAsync(int roomId);
+        Task<ResultModel> GetByFilterAsync(RoomFilter filter);
+        Task<ResultModel> DeleteAsync(int roomId, string deletedBy);
+        Task<bool> ExistsByRoomNumberAsync(string roomNumber, int? roomId);
 
-        Task<RoomResponse> CreateAsync(RoomRequest request);
-        Task<RoomResponse?> UpdateAsync(int id, RoomRequest request);
-        Task<bool> DeleteAsync(int id);
-
-        Task<bool> IncreaseOccupancyAsync(int roomId);
-        Task<bool> DecreaseOccupancyAsync(int roomId);
     }
 }

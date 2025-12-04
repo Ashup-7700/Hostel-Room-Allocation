@@ -18,8 +18,8 @@ namespace Kemar.HRM.Model.Request
         [Range(0.0, double.MaxValue, ErrorMessage = "Security Deposit must be greater than or equal to 0.")]
         public decimal SecurityDeposit { get; set; }
 
-
         public string? CreatedBy { get; set; }
         public string? UpdatedBy { get; set; }
+
     }
 }

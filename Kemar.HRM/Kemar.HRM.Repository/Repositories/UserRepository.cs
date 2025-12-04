@@ -8,7 +8,6 @@ using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Kemar.HRM.Repository.Repositories
 {
     public class UserRepository : IUser
@@ -26,16 +25,14 @@ namespace Kemar.HRM.Repository.Repositories
         {
             try
             {
-                
                 if (request.UserId.HasValue && request.UserId.Value > 0)
                 {
                     var existing = await _context.Users
-                        .FirstOrDefaultAsync(u => u.UserId == request.UserId.Value);
+                        .FirstOrDefaultAsync(x => x.UserId == request.UserId.Value);
 
                     if (existing == null)
                         return ResultModel.NotFound("User not found");
 
-              
                     _mapper.Map(request, existing);
 
                     existing.UpdatedAt = DateTime.UtcNow;
@@ -43,23 +40,18 @@ namespace Kemar.HRM.Repository.Repositories
                         existing.UpdatedBy = request.UpdatedBy;
 
                     await _context.SaveChangesAsync();
-
-            
                     return ResultModel.Updated(null, "User updated successfully");
                 }
-                else
-                {
-                    var entity = _mapper.Map<User>(request);
-                    entity.CreatedAt = DateTime.UtcNow;
-                    entity.IsActive = true;
-                    entity.CreatedBy = request.CreatedBy;
 
-                    _context.Users.Add(entity);
-                    await _context.SaveChangesAsync();
+                var entity = _mapper.Map<User>(request);
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.CreatedBy = request.CreatedBy;
+                entity.IsActive = true;    
 
-    
-                    return ResultModel.Created(null, "User created successfully");
-                }
+                await _context.Users.AddAsync(entity);
+                await _context.SaveChangesAsync();
+
+                return ResultModel.Created(null, "User created successfully");
             }
             catch (Exception ex)
             {
@@ -71,17 +63,20 @@ namespace Kemar.HRM.Repository.Repositories
         {
             var entity = await _context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(x => x.UserId == userId);
 
             if (entity == null)
                 return ResultModel.NotFound("User not found");
 
-            return ResultModel.Success(_mapper.Map<UserResponse>(entity), "User data fetched successfully");
+            var dto = _mapper.Map<UserResponse>(entity);
+            return ResultModel.Success(dto, "User data fetched successfully");
         }
 
         public async Task<ResultModel> GetByFilterAsync(UserFilter filter)
         {
-            var query = _context.Users.AsNoTracking().AsQueryable();
+            var query = _context.Users
+                .AsNoTracking()
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter.FullName))
                 query = query.Where(u => u.FullName.Contains(filter.FullName));
@@ -90,40 +85,33 @@ namespace Kemar.HRM.Repository.Repositories
                 query = query.Where(u => u.Email.Contains(filter.Email));
 
             if (!string.IsNullOrWhiteSpace(filter.Role))
-                query = query.Where(u => u.Role == filter.Role);
+                query = query.Where(u => u.Role.Contains(filter.Role));
 
-            if (filter.IsActive.HasValue)
-                query = query.Where(u => u.IsActive == filter.IsActive.Value);
+            var list = await query.ToListAsync();
 
+            return ResultModel.Success(
+                _mapper.Map<List<UserResponse>>(list),
+                "User list fetched successfully"
+            );
+        }
 
-            if (!string.IsNullOrWhiteSpace(filter.SortBy))
-            {
-                if (filter.SortBy.Equals("UserId", StringComparison.OrdinalIgnoreCase))
-                    query = filter.SortDesc ? query.OrderByDescending(u => u.UserId) : query.OrderBy(u => u.UserId);
-                else if (filter.SortBy.Equals("FullName", StringComparison.OrdinalIgnoreCase))
-                    query = filter.SortDesc ? query.OrderByDescending(u => u.FullName) : query.OrderBy(u => u.FullName);
-      
-            }
-            else
-            {
-                query = query.OrderBy(u => u.UserId);
-            }
+        public async Task<ResultModel> DeleteAsync(int userId, string deletedBy = null)
+        {
+            var existing = await _context.Users
+                .FirstOrDefaultAsync(x => x.UserId == userId);
 
-            var total = await query.CountAsync();
-            var items = await query
-                .Skip((filter.Page - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToListAsync();
+            if (existing == null)
+                return ResultModel.NotFound("User not found");
 
-            var payload = new
-            {
-                Total = total,
-                Page = filter.Page,
-                PageSize = filter.PageSize,
-                Items = _mapper.Map<List<UserResponse>>(items)
-            };
+            existing.IsActive = false;
+            existing.UpdatedAt = DateTime.UtcNow;
 
-            return ResultModel.Success(payload, "User list fetched successfully");
+            if (!string.IsNullOrWhiteSpace(deletedBy))
+                existing.UpdatedBy = deletedBy;
+
+            await _context.SaveChangesAsync();
+
+            return ResultModel.Success(null, "User deleted successfully");
         }
 
         public async Task<bool> ExistsByEmailAsync(string email, int? excludingUserId = null)
@@ -135,22 +123,6 @@ namespace Kemar.HRM.Repository.Repositories
                     u.Email.Trim().ToLower() == email &&
                     (excludingUserId == null || u.UserId != excludingUserId.Value)
                 );
-        }
-
-        public async Task<ResultModel> DeleteAsync(int userId, string deletedBy = null)
-        {
-            var existing = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-            if (existing == null)
-                return ResultModel.NotFound("User not found");
-
-            existing.IsActive = false;
-            existing.UpdatedAt = DateTime.UtcNow;
-            if (!string.IsNullOrWhiteSpace(deletedBy))
-                existing.UpdatedBy = deletedBy;
-
-            await _context.SaveChangesAsync();
-
-            return ResultModel.Success(null, "User deleted successfully");
         }
     }
 }

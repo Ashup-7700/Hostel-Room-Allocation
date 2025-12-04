@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Kemar.HRM.Repository.Migrations
 {
-    /// <inheritdoc />
     public partial class Inti : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -186,7 +184,6 @@ namespace Kemar.HRM.Repository.Migrations
                 column: "StudentId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Kemar.HRM.Model.Request
 {
@@ -26,9 +25,8 @@ namespace Kemar.HRM.Model.Request
         public DateTime DateOfAdmission { get; set; }
 
         public bool? IsActive { get; set; } = true;
-
-        // Audit fields — set by CommonHelper before calling manager
         public string? CreatedBy { get; set; }
         public string? UpdatedBy { get; set; }
+
     }
 }

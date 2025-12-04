@@ -39,5 +39,6 @@ namespace Kemar.HRM.Model.Common
 
         public static ResultModel Unauthorized(string? message = "Unauthorized")
             => Failure(ResultCode.Unauthorized, message);
+
     }
 }

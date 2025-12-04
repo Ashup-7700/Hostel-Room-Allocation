@@ -7,10 +7,6 @@ using Kemar.HRM.Repository.Context;
 using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Kemar.HRM.Repository.Repositories
 {
@@ -31,7 +27,6 @@ namespace Kemar.HRM.Repository.Repositories
             {
                 if (request.StudentId.HasValue && request.StudentId.Value > 0)
                 {
-                    // UPDATE
                     var existing = await _context.Students
                         .FirstOrDefaultAsync(s => s.StudentId == request.StudentId.Value);
 
@@ -45,23 +40,18 @@ namespace Kemar.HRM.Repository.Repositories
                         existing.UpdatedBy = request.UpdatedBy;
 
                     await _context.SaveChangesAsync();
-
-                    // Return Updated code without data (per Option A behavior)
                     return ResultModel.Updated(null, "Student updated successfully");
                 }
-                else
-                {
-                    // CREATE
-                    var entity = _mapper.Map<Student>(request);
-                    entity.CreatedAt = DateTime.UtcNow;
-                    entity.IsActive = request.IsActive ?? true;
-                    entity.CreatedBy = request.CreatedBy;
 
-                    _context.Students.Add(entity);
-                    await _context.SaveChangesAsync();
+                var entity = _mapper.Map<Student>(request);
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.CreatedBy = request.CreatedBy;
+                entity.IsActive = request.IsActive ?? true;
 
-                    return ResultModel.Created(null, "Student created successfully");
-                }
+                await _context.Students.AddAsync(entity);
+                await _context.SaveChangesAsync();
+
+                return ResultModel.Created(null, "Student created successfully");
             }
             catch (Exception ex)
             {
@@ -84,7 +74,9 @@ namespace Kemar.HRM.Repository.Repositories
 
         public async Task<ResultModel> GetByFilterAsync(StudentFilter filter)
         {
-            var query = _context.Students.AsNoTracking().AsQueryable();
+            var query = _context.Students
+                .AsNoTracking()
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter.Name))
                 query = query.Where(s => s.Name.Contains(filter.Name));
@@ -95,34 +87,12 @@ namespace Kemar.HRM.Repository.Repositories
             if (filter.IsActive.HasValue)
                 query = query.Where(s => s.IsActive == filter.IsActive.Value);
 
-            // Sorting
-            if (!string.IsNullOrWhiteSpace(filter.SortBy))
-            {
-                if (filter.SortBy.Equals("StudentId", StringComparison.OrdinalIgnoreCase))
-                    query = filter.SortDesc ? query.OrderByDescending(s => s.StudentId) : query.OrderBy(s => s.StudentId);
-                else if (filter.SortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
-                    query = filter.SortDesc ? query.OrderByDescending(s => s.Name) : query.OrderBy(s => s.Name);
-            }
-            else
-            {
-                query = query.OrderBy(s => s.StudentId);
-            }
+            var list = await query.ToListAsync();
 
-            var total = await query.CountAsync();
-            var items = await query
-                .Skip((filter.Page - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToListAsync();
-
-            var payload = new
-            {
-                Total = total,
-                Page = filter.Page,
-                PageSize = filter.PageSize,
-                Items = _mapper.Map<List<StudentResponse>>(items)
-            };
-
-            return ResultModel.Success(payload, "Student list fetched successfully");
+            return ResultModel.Success(
+                _mapper.Map<List<StudentResponse>>(list),
+                "Student list fetched successfully"
+            );
         }
 
         public async Task<bool> ExistsByEmailAsync(string email, int? excludingStudentId = null)
@@ -138,19 +108,22 @@ namespace Kemar.HRM.Repository.Repositories
 
         public async Task<ResultModel> DeleteAsync(int studentId, string deletedBy = null)
         {
-            var existing = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
+            var existing = await _context.Students
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
             if (existing == null)
                 return ResultModel.NotFound("Student not found");
 
-            // Soft delete
             existing.IsActive = false;
             existing.UpdatedAt = DateTime.UtcNow;
+
             if (!string.IsNullOrWhiteSpace(deletedBy))
                 existing.UpdatedBy = deletedBy;
 
             await _context.SaveChangesAsync();
 
             return ResultModel.Success(null, "Student deleted successfully");
+
         }
     }
 }
