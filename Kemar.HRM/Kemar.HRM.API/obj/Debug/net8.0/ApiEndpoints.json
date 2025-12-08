@@ -257,7 +257,7 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.StudentController",
-    "Method": "AddOrUpdate",
+    "Method": "AddOrUpdateAsync",
     "RelativePath": "api/Student/addOrUpdate",
     "HttpMethod": "POST",
     "IsController": true,
@@ -273,7 +273,7 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.StudentController",
-    "Method": "Delete",
+    "Method": "DeleteAsync",
     "RelativePath": "api/Student/delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
@@ -289,23 +289,17 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.StudentController",
-    "Method": "GetByFilter",
-    "RelativePath": "api/Student/getByFilter",
-    "HttpMethod": "POST",
+    "Method": "GetAllAsync",
+    "RelativePath": "api/Student/getAll",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [
-      {
-        "Name": "filter",
-        "Type": "Kemar.HRM.Model.Filter.StudentFilter",
-        "IsRequired": true
-      }
-    ],
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.StudentController",
-    "Method": "GetById",
+    "Method": "GetByIdAsync",
     "RelativePath": "api/Student/getById/{id}",
     "HttpMethod": "GET",
     "IsController": true,
@@ -321,7 +315,7 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.UserController",
-    "Method": "AddOrUpdate",
+    "Method": "AddOrUpdateAsync",
     "RelativePath": "api/User/addOrUpdate",
     "HttpMethod": "POST",
     "IsController": true,
@@ -337,14 +331,14 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.UserController",
-    "Method": "Delete",
-    "RelativePath": "api/User/delete/{id}",
+    "Method": "DeleteAsync",
+    "RelativePath": "api/User/delete/{userId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "userId",
         "Type": "System.Int32",
         "IsRequired": true
       }
@@ -353,7 +347,7 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.UserController",
-    "Method": "GetByFilter",
+    "Method": "GetByFilterAsync",
     "RelativePath": "api/User/getByFilter",
     "HttpMethod": "POST",
     "IsController": true,
@@ -361,7 +355,7 @@
     "Parameters": [
       {
         "Name": "filter",
-        "Type": "Kemar.HRM.Model.Filter.UserFilter",
+        "Type": "UserFilter",
         "IsRequired": true
       }
     ],
@@ -369,15 +363,31 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.UserController",
-    "Method": "GetById",
-    "RelativePath": "api/User/getById/{id}",
+    "Method": "GetByIdAsync",
+    "RelativePath": "api/User/getById/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "userId",
         "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.UserController",
+    "Method": "LoginAsync",
+    "RelativePath": "api/User/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Kemar.HRM.Model.Request.UserLoginRequest",
         "IsRequired": true
       }
     ],

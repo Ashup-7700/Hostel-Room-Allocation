@@ -11,14 +11,7 @@ namespace Kemar.HRM.API.AutoMapper
         {
             #region Student
 
-            CreateMap<StudentRequest, Student>()
-                .ForMember(dest => dest.StudentId, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
-                .ForMember(dest => dest.RoomAllocations, opt => opt.Ignore())
-                .ForMember(dest => dest.Payments, opt => opt.Ignore());
+            CreateMap<StudentRequest, Student>();
 
             CreateMap<Student, StudentResponse>();
 
@@ -57,11 +50,12 @@ namespace Kemar.HRM.API.AutoMapper
             #region User
 
             CreateMap<UserRequest, User>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
-                .ForMember(dest => dest.AllocationsHandled, opt => opt.Ignore());
+                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                 .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                 .ForMember(dest => dest.Password, opt => opt.Ignore());
 
             CreateMap<User, UserResponse>();
 

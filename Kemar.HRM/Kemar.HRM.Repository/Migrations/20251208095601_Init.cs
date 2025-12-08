@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Kemar.HRM.Repository.Migrations
 {
-    public partial class Inti : Migration
+    /// <inheritdoc />
+    public partial class Init : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -15,7 +17,7 @@ namespace Kemar.HRM.Repository.Migrations
                 {
                     FeeStructureId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoomType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    RoomType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     MonthlyRent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     SecurityDeposit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -81,14 +83,14 @@ namespace Kemar.HRM.Repository.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
-                    MobileNo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "Warden"),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -134,8 +136,8 @@ namespace Kemar.HRM.Repository.Migrations
                     AllocatedByUserId = table.Column<int>(type: "int", nullable: false),
                     AllocatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ReleasedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
@@ -148,7 +150,7 @@ namespace Kemar.HRM.Repository.Migrations
                         column: x => x.RoomId,
                         principalTable: "Rooms",
                         principalColumn: "RoomId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_RoomAllocations_Students_StudentId",
                         column: x => x.StudentId,
@@ -161,6 +163,29 @@ namespace Kemar.HRM.Repository.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserTokens",
+                columns: table => new
+                {
+                    UserTokenId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Token = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    GeneratedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SystemIp = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTokens", x => x.UserTokenId);
+                    table.ForeignKey(
+                        name: "FK_UserTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -182,8 +207,14 @@ namespace Kemar.HRM.Repository.Migrations
                 name: "IX_RoomAllocations_StudentId",
                 table: "RoomAllocations",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserTokens_UserId",
+                table: "UserTokens",
+                column: "UserId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
@@ -194,6 +225,9 @@ namespace Kemar.HRM.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoomAllocations");
+
+            migrationBuilder.DropTable(
+                name: "UserTokens");
 
             migrationBuilder.DropTable(
                 name: "Rooms");

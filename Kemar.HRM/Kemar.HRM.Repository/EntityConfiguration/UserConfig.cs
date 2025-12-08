@@ -14,8 +14,6 @@ namespace Kemar.HRM.Repository.EntityConfiguration
             builder.Property(x => x.UserId).ValueGeneratedOnAdd().UseIdentityColumn();
 
             builder.Property(x => x.FullName).HasMaxLength(150).IsRequired();
-            builder.Property(x => x.Email).HasMaxLength(120).IsRequired();
-            builder.Property(x => x.MobileNo).HasMaxLength(20);
             builder.Property(x => x.Role).HasMaxLength(50).HasDefaultValue("Warden");
 
             builder.HasMany(u => u.AllocationsHandled).WithOne(ra => ra.AllocatedBy).HasForeignKey(ra => ra.AllocatedByUserId).OnDelete(DeleteBehavior.Restrict);

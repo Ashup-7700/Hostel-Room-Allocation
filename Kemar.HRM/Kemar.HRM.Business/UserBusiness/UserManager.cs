@@ -1,62 +1,117 @@
 ﻿using Kemar.HRM.Model.Common;
-using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
+using Kemar.HRM.Model.Response;
+using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
+using Kemar.HRM.Business.UserTokenBusiness;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Kemar.HRM.Business.UserBusiness
 {
     public class UserManager : IUserManager
     {
         private readonly IUser _userRepo;
+        private readonly IUserTokenManager _userTokenManager;
+        private readonly IConfiguration _config;
 
-        public UserManager(IUser userRepo)
+        public UserManager(IUser userRepo, IUserTokenManager userTokenManager, IConfiguration config)
         {
             _userRepo = userRepo;
+            _userTokenManager = userTokenManager;
+            _config = config;
         }
 
+        // Register or Update User
         public async Task<ResultModel> AddOrUpdateAsync(UserRequest request)
         {
-            if (request == null)
-                return ResultModel.Failure(ResultCode.Invalid, "Invalid request");
-
-            if (string.IsNullOrWhiteSpace(request.Email))
-                return ResultModel.Failure(ResultCode.Invalid, "Email is required");
-
-
-            request.Email = request.Email.Trim().ToLower();
-
-            var exists = await _userRepo.ExistsByEmailAsync(
-                request.Email,
-                request.UserId
-            );
-
-            if (exists)
-                return ResultModel.Failure(ResultCode.DuplicateRecord, "Email already exists");
-
             return await _userRepo.AddOrUpdateAsync(request);
         }
 
-        public async Task<ResultModel> GetByIdAsync(int userId)
-        {
-            if (userId <= 0)
-                return ResultModel.Failure(ResultCode.Invalid, "Invalid user id");
-
-            return await _userRepo.GetByIdAsync(userId);
-        }
-
+        // Get Users by filter
         public async Task<ResultModel> GetByFilterAsync(UserFilter filter)
         {
-            filter ??= new UserFilter();
             return await _userRepo.GetByFilterAsync(filter);
         }
 
-        public async Task<ResultModel> DeleteAsync(int userId, string deletedBy = null)
+        // Authenticate user and save token
+        public async Task<ResultModel> AuthenticateAsync(UserLoginRequest request)
         {
-            if (userId <= 0)
-                return ResultModel.Failure(ResultCode.Invalid, "Invalid user id");
+            var user = await _userRepo.AuthenticateAsync(request.Username, request.Password);
 
-            return await _userRepo.DeleteAsync(userId, deletedBy);
+            if (user == null)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid username or password");
 
+            // Generate JWT token
+            var token = GenerateJwtToken(user);
+            var generatedAt = DateTime.UtcNow;
+            var expiresAt = generatedAt.AddMinutes(40); // Token expiry
+
+            // Save token in UserToken table
+            await _userTokenManager.CreateTokenAsync(user.UserId, token, GetClientIp(), expiresAt);
+
+            // Prepare response
+            var response = new UserLoginResponse
+            {
+                Token = token,
+                Username = user.Username,
+                FullName = user.FullName,
+                Role = user.Role,
+                GeneratedAt = generatedAt,
+                ExpiresAt = expiresAt,
+                SystemIp = GetClientIp()
+            };
+
+            return ResultModel.Success(response, "Authentication successful");
+        }
+
+        // JWT token generation
+        private string GenerateJwtToken(User user)
+        {
+            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"] ?? "ThisIsASecretKey12345");
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.Role)
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(40),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        // Get User by Id
+        public async Task<ResultModel> GetByIdAsync(int userId)
+        {
+            return await _userRepo.GetByIdAsync(userId);
+        }
+
+        // Delete User
+        public async Task<ResultModel> DeleteAsync(int userId)
+        {
+            var result = await _userRepo.DeleteAsync(userId);
+            if (result.StatusCode == ResultCode.RecordNotFound)
+                return result;
+
+            return ResultModel.Success(null, "User deleted successfully");
+        }
+
+        // Get client IP (placeholder, replace with actual logic)
+        private string GetClientIp()
+        {
+            return "127.0.0.1"; // or use HttpContext if available
         }
     }
 }

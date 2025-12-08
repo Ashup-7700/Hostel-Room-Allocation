@@ -1,16 +1,18 @@
-﻿using Kemar.HRM.Model.Common;
-using Kemar.HRM.Model.Filter;
+﻿using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Model.Request;
+using Kemar.HRM.Model.Common;
+using Kemar.HRM.Model.Filter;
 
 namespace Kemar.HRM.Repository.Interface
 {
-    public interface IUser
-    {
-        Task<ResultModel> AddOrUpdateAsync(UserRequest request);
-        Task<ResultModel> GetByIdAsync(int userId);
-        Task<ResultModel> GetByFilterAsync(UserFilter filter);
-        Task<bool> ExistsByEmailAsync(string email, int? excludingUserId = null);
-        Task<ResultModel> DeleteAsync(int userId, string deletedBy = null);
+        public interface IUser
+        {
+            Task<ResultModel> AddOrUpdateAsync(UserRequest request);
+            Task<User?> AuthenticateAsync(string username, string password);
+            Task<ResultModel> GetByIdAsync(int userId);
+            Task<ResultModel> GetByFilterAsync(UserFilter filter);
+            Task<ResultModel> DeleteAsync(int userId);
+        }
 
     }
-}
+

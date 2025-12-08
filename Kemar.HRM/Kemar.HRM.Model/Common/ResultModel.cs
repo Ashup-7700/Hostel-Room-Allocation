@@ -5,11 +5,13 @@
         Success = 200,
         SuccessfullyCreated = 201,
         SuccessfullyUpdated = 202,
+
+        Invalid = 400,
         Unauthorized = 401,
-        DuplicateRecord = 409,
         RecordNotFound = 404,
         NotAllowed = 405,
-        Invalid = 400,
+        DuplicateRecord = 409,
+
         ExceptionThrown = 500
     }
 }
@@ -21,6 +23,11 @@ namespace Kemar.HRM.Model.Common
         public ResultCode StatusCode { get; set; } = ResultCode.Success;
         public string? Message { get; set; }
         public object? Data { get; set; }
+
+        public bool IsSuccess =>
+       StatusCode == ResultCode.Success ||
+       StatusCode == ResultCode.SuccessfullyCreated ||
+       StatusCode == ResultCode.SuccessfullyUpdated;
 
         public static ResultModel Success(object? data = null, string? message = "Success")
             => new ResultModel { StatusCode = ResultCode.Success, Message = message, Data = data };

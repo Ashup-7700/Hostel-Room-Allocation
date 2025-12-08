@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Kemar.HRM.Model.Common;
-using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Response;
 using Kemar.HRM.Repository.Context;
@@ -21,34 +20,35 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
-        public async Task<ResultModel> AddOrUpdateAsync(StudentRequest request)
+        public async Task<ResultModel> AddOrUpdateAsync(StudentRequest request, string loginUser)
         {
             try
             {
-                if (request.StudentId.HasValue && request.StudentId.Value > 0)
+                if (request.StudentId > 0)
                 {
-                    var existing = await _context.Students
-                        .FirstOrDefaultAsync(s => s.StudentId == request.StudentId.Value);
-
-                    if (existing == null)
+                    var student = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == request.StudentId);
+                    if (student == null)
                         return ResultModel.NotFound("Student not found");
 
-                    _mapper.Map(request, existing);
-
-                    existing.UpdatedAt = DateTime.UtcNow;
-                    if (!string.IsNullOrWhiteSpace(request.UpdatedBy))
-                        existing.UpdatedBy = request.UpdatedBy;
+                    student.Name = request.Name;
+                    student.Gender = request.Gender;
+                    student.Phone = request.Phone;
+                    student.Email = request.Email;
+                    student.Address = request.Address;
+                    student.DateOfAdmission = request.DateOfAdmission;
+                    student.IsActive = request.IsActive ?? student.IsActive;
+                    student.UpdatedAt = DateTime.UtcNow;
+                    student.UpdatedBy = loginUser;
 
                     await _context.SaveChangesAsync();
                     return ResultModel.Updated(null, "Student updated successfully");
                 }
 
-                var entity = _mapper.Map<Student>(request);
-                entity.CreatedAt = DateTime.UtcNow;
-                entity.CreatedBy = request.CreatedBy;
-                entity.IsActive = request.IsActive ?? true;
+                var newStudent = _mapper.Map<Student>(request);
+                newStudent.CreatedBy = loginUser;
+                newStudent.CreatedAt = DateTime.UtcNow;
 
-                await _context.Students.AddAsync(entity);
+                await _context.Students.AddAsync(newStudent);
                 await _context.SaveChangesAsync();
 
                 return ResultModel.Created(null, "Student created successfully");
@@ -61,69 +61,35 @@ namespace Kemar.HRM.Repository.Repositories
 
         public async Task<ResultModel> GetByIdAsync(int studentId)
         {
-            var entity = await _context.Students
-                .AsNoTracking()
-                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+            var student = await _context.Students.AsNoTracking()
+                                .FirstOrDefaultAsync(s => s.StudentId == studentId && s.IsActive);
 
-            if (entity == null)
+            if (student == null)
                 return ResultModel.NotFound("Student not found");
 
-            var dto = _mapper.Map<StudentResponse>(entity);
-            return ResultModel.Success(dto, "Student data fetched successfully");
+            var dto = _mapper.Map<StudentResponse>(student);
+            return ResultModel.Success(dto, "Student fetched successfully");
         }
 
-        public async Task<ResultModel> GetByFilterAsync(StudentFilter filter)
+        public async Task<ResultModel> GetAllAsync()
         {
-            var query = _context.Students
-                .AsNoTracking()
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(filter.Name))
-                query = query.Where(s => s.Name.Contains(filter.Name));
-
-            if (!string.IsNullOrWhiteSpace(filter.Email))
-                query = query.Where(s => s.Email.Contains(filter.Email));
-
-            if (filter.IsActive.HasValue)
-                query = query.Where(s => s.IsActive == filter.IsActive.Value);
-
-            var list = await query.ToListAsync();
-
-            return ResultModel.Success(
-                _mapper.Map<List<StudentResponse>>(list),
-                "Student list fetched successfully"
-            );
+            var students = await _context.Students.AsNoTracking().ToListAsync();
+            var dto = _mapper.Map<List<StudentResponse>>(students);
+            return ResultModel.Success(dto, "Student list fetched successfully");
         }
 
-        public async Task<bool> ExistsByEmailAsync(string email, int? excludingStudentId = null)
+        public async Task<ResultModel> DeleteAsync(int studentId, string loginUser)
         {
-            email = (email ?? string.Empty).Trim().ToLower();
-
-            return await _context.Students
-                .AnyAsync(s =>
-                    s.Email.Trim().ToLower() == email &&
-                    (excludingStudentId == null || s.StudentId != excludingStudentId.Value)
-                );
-        }
-
-        public async Task<ResultModel> DeleteAsync(int studentId, string deletedBy = null)
-        {
-            var existing = await _context.Students
-                .FirstOrDefaultAsync(s => s.StudentId == studentId);
-
-            if (existing == null)
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
+            if (student == null)
                 return ResultModel.NotFound("Student not found");
 
-            existing.IsActive = false;
-            existing.UpdatedAt = DateTime.UtcNow;
-
-            if (!string.IsNullOrWhiteSpace(deletedBy))
-                existing.UpdatedBy = deletedBy;
+            student.IsActive = false;
+            student.UpdatedBy = loginUser;
+            student.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-
             return ResultModel.Success(null, "Student deleted successfully");
-
         }
     }
 }

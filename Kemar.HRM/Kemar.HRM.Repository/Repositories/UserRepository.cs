@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Kemar.HRM.Model.Common;
-using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Response;
 using Kemar.HRM.Repository.Context;
 using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Kemar.HRM.Repository.Repositories
 {
@@ -21,34 +22,44 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
+        // Add or update a user
         public async Task<ResultModel> AddOrUpdateAsync(UserRequest request)
         {
             try
             {
-                if (request.UserId.HasValue && request.UserId.Value > 0)
+                // UPDATE
+                if (request.UserId > 0)
                 {
-                    var existing = await _context.Users
-                        .FirstOrDefaultAsync(x => x.UserId == request.UserId.Value);
-
+                    var existing = await _context.Users.FirstOrDefaultAsync(u => u.UserId == request.UserId);
                     if (existing == null)
                         return ResultModel.NotFound("User not found");
 
-                    _mapper.Map(request, existing);
+                    // Update all fields
+                    existing.Username = request.Username;         // ✅ ADDED
+                    existing.FullName = request.FullName;
+                    existing.Role = request.Role;
+                    existing.IsActive = request.IsActive ?? existing.IsActive;
+
+                    if (!string.IsNullOrWhiteSpace(request.Password))
+                        existing.Password = HashPassword(request.Password);
 
                     existing.UpdatedAt = DateTime.UtcNow;
-                    if (!string.IsNullOrWhiteSpace(request.UpdatedBy))
-                        existing.UpdatedBy = request.UpdatedBy;
+                    existing.UpdatedBy = "admin";
 
                     await _context.SaveChangesAsync();
                     return ResultModel.Updated(null, "User updated successfully");
                 }
 
-                var entity = _mapper.Map<User>(request);
-                entity.CreatedAt = DateTime.UtcNow;
-                entity.CreatedBy = request.CreatedBy;
-                entity.IsActive = true;    
+                // CREATE
+                var user = _mapper.Map<User>(request);
+                user.Password = HashPassword(request.Password);
+                user.CreatedAt = DateTime.UtcNow;
+                user.CreatedBy = "admin";
+                user.UpdatedAt = null;
+                user.UpdatedBy = null;
+                user.IsActive = request.IsActive ?? true;
 
-                await _context.Users.AddAsync(entity);
+                await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
 
                 return ResultModel.Created(null, "User created successfully");
@@ -59,70 +70,75 @@ namespace Kemar.HRM.Repository.Repositories
             }
         }
 
-        public async Task<ResultModel> GetByIdAsync(int userId)
-        {
-            var entity = await _context.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == userId);
-
-            if (entity == null)
-                return ResultModel.NotFound("User not found");
-
-            var dto = _mapper.Map<UserResponse>(entity);
-            return ResultModel.Success(dto, "User data fetched successfully");
-        }
 
         public async Task<ResultModel> GetByFilterAsync(UserFilter filter)
         {
-            var query = _context.Users
-                .AsNoTracking()
-                .AsQueryable();
+            var query = _context.Users.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filter.FullName))
                 query = query.Where(u => u.FullName.Contains(filter.FullName));
 
-            if (!string.IsNullOrWhiteSpace(filter.Email))
-                query = query.Where(u => u.Email.Contains(filter.Email));
-
             if (!string.IsNullOrWhiteSpace(filter.Role))
-                query = query.Where(u => u.Role.Contains(filter.Role));
+                query = query.Where(u => u.Role == filter.Role);
 
-            var list = await query.ToListAsync();
+            if (filter.IsActive.HasValue)
+                query = query.Where(u => u.IsActive == filter.IsActive.Value);
 
-            return ResultModel.Success(
-                _mapper.Map<List<UserResponse>>(list),
-                "User list fetched successfully"
-            );
+            var list = await query.AsNoTracking().ToListAsync();
+
+            var dto = _mapper.Map<List<UserResponse>>(list);
+
+            return ResultModel.Success(dto, "Filtered user list fetched successfully");
         }
 
-        public async Task<ResultModel> DeleteAsync(int userId, string deletedBy = null)
+
+        // Get a single user by ID
+        public async Task<ResultModel> GetByIdAsync(int userId)
         {
-            var existing = await _context.Users
-                .FirstOrDefaultAsync(x => x.UserId == userId);
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null) return ResultModel.NotFound("User not found");
 
-            if (existing == null)
-                return ResultModel.NotFound("User not found");
+            var dto = _mapper.Map<UserResponse>(user);
+            return ResultModel.Success(dto, "User fetched successfully");
+        }
 
-            existing.IsActive = false;
-            existing.UpdatedAt = DateTime.UtcNow;
+        // Get all users
+        public async Task<ResultModel> GetAllAsync()
+        {
+            var list = await _context.Users.AsNoTracking().ToListAsync();
+            var dto = _mapper.Map<List<UserResponse>>(list);
+            return ResultModel.Success(dto, "User list fetched successfully");
+        }
 
-            if (!string.IsNullOrWhiteSpace(deletedBy))
-                existing.UpdatedBy = deletedBy;
+        // Soft delete
+        public async Task<ResultModel> DeleteAsync(int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null) return ResultModel.NotFound("User not found");
+
+            user.IsActive = false;
+            user.UpdatedAt = DateTime.UtcNow;
+            user.UpdatedBy = "admin";
 
             await _context.SaveChangesAsync();
-
             return ResultModel.Success(null, "User deleted successfully");
         }
 
-        public async Task<bool> ExistsByEmailAsync(string email, int? excludingUserId = null)
+        // Authenticate user
+        public async Task<User?> AuthenticateAsync(string username, string password)
         {
-            email = (email ?? string.Empty).Trim().ToLower();
-
+            var hashed = HashPassword(password);
             return await _context.Users
-                .AnyAsync(u =>
-                    u.Email.Trim().ToLower() == email &&
-                    (excludingUserId == null || u.UserId != excludingUserId.Value)
-                );
+                .FirstOrDefaultAsync(u => u.Username == username && u.Password == hashed && u.IsActive);
         }
+
+        // SHA256 password hashing
+        private string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(bytes);
+        }
+
     }
 }

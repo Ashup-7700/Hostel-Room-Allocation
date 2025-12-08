@@ -11,6 +11,7 @@ C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Aut
 C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Azure.Identity.dll
 C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Humanizer.dll
+C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 C:\Users\Ashutosh Patil\Desktop\HRM\Kemar.HRM\Kemar.HRM.API\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll

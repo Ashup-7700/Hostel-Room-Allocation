@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Kemar.HRM.API",
-    "version": "1.0"
+    "title": "Kemar.HRM API",
+    "version": "v1"
   },
   "paths": {
     "/api/FeeStructure/addOrUpdate": {
@@ -487,30 +487,11 @@
         }
       }
     },
-    "/api/Student/getByFilter": {
-      "post": {
+    "/api/Student/getAll": {
+      "get": {
         "tags": [
           "Student"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StudentFilter"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StudentFilter"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/StudentFilter"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -572,14 +553,14 @@
         }
       }
     },
-    "/api/User/getById/{id}": {
+    "/api/User/getById/{userId}": {
       "get": {
         "tags": [
           "User"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -626,14 +607,14 @@
         }
       }
     },
-    "/api/User/delete/{id}": {
+    "/api/User/delete/{userId}": {
       "delete": {
         "tags": [
           "User"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -642,6 +623,37 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -933,31 +945,7 @@
         },
         "additionalProperties": false
       },
-      "StudentFilter": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "StudentRequest": {
-        "required": [
-          "dateOfAdmission",
-          "email",
-          "gender",
-          "name"
-        ],
         "type": "object",
         "properties": {
           "studentId": {
@@ -967,13 +955,13 @@
           },
           "name": {
             "maxLength": 100,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "gender": {
             "maxLength": 10,
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "phone": {
             "maxLength": 15,
@@ -982,9 +970,9 @@
           },
           "email": {
             "maxLength": 120,
-            "minLength": 1,
             "type": "string",
-            "format": "email"
+            "format": "email",
+            "nullable": true
           },
           "address": {
             "maxLength": 200,
@@ -998,14 +986,6 @@
           "isActive": {
             "type": "boolean",
             "nullable": true
-          },
-          "createdBy": {
-            "type": "string",
-            "nullable": true
-          },
-          "updatedBy": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1017,11 +997,25 @@
             "type": "string",
             "nullable": true
           },
-          "email": {
+          "role": {
             "type": "string",
             "nullable": true
           },
-          "role": {
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserLoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
             "type": "string",
             "nullable": true
           }
@@ -1029,10 +1023,6 @@
         "additionalProperties": false
       },
       "UserRequest": {
-        "required": [
-          "email",
-          "fullName"
-        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -1040,42 +1030,40 @@
             "format": "int32",
             "nullable": true
           },
-          "fullName": {
-            "maxLength": 150,
-            "minLength": 1,
-            "type": "string"
-          },
-          "email": {
-            "maxLength": 120,
-            "minLength": 1,
+          "username": {
             "type": "string",
-            "format": "email"
+            "nullable": true
           },
-          "mobileNo": {
-            "maxLength": 20,
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
             "type": "string",
             "nullable": true
           },
           "role": {
-            "maxLength": 50,
             "type": "string",
             "nullable": true
           },
           "isActive": {
             "type": "boolean",
             "nullable": true
-          },
-          "createdBy": {
-            "type": "string",
-            "nullable": true
-          },
-          "updatedBy": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter 'Bearer' [space] and then your valid JWT token.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
     }
-  }
+  },
+  "security": [
+    { }
+  ]
 }

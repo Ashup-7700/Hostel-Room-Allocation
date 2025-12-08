@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kemar.HRM.Repository.Migrations
 {
     [DbContext(typeof(HostelDbContext))]
-    [Migration("20251203131135_Inti")]
-    partial class Inti
+    [Migration("20251208095601_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,8 +48,8 @@ namespace Kemar.HRM.Repository.Migrations
 
                     b.Property<string>("RoomType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("SecurityDeposit")
                         .HasColumnType("decimal(18,2)");
@@ -184,7 +184,8 @@ namespace Kemar.HRM.Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -202,7 +203,8 @@ namespace Kemar.HRM.Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("RoomAllocationId");
 
@@ -268,7 +270,7 @@ namespace Kemar.HRM.Repository.Migrations
 
                     b.HasKey("StudentId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.User", b =>
@@ -286,11 +288,6 @@ namespace Kemar.HRM.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -299,10 +296,9 @@ namespace Kemar.HRM.Repository.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("MobileNo")
+                    b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -318,9 +314,46 @@ namespace Kemar.HRM.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("UserId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Kemar.HRM.Repository.Entity.UserToken", b =>
+                {
+                    b.Property<int>("UserTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserTokenId"));
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemIp")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserTokenId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserTokens");
                 });
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.Payment", b =>
@@ -345,7 +378,7 @@ namespace Kemar.HRM.Repository.Migrations
                     b.HasOne("Kemar.HRM.Repository.Entity.Room", "Room")
                         .WithMany("RoomAllocations")
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Kemar.HRM.Repository.Entity.Student", "Student")
@@ -359,6 +392,15 @@ namespace Kemar.HRM.Repository.Migrations
                     b.Navigation("Room");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Kemar.HRM.Repository.Entity.UserToken", b =>
+                {
+                    b.HasOne("Kemar.HRM.Repository.Entity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.Room", b =>

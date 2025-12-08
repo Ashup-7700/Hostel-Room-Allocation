@@ -7,25 +7,28 @@ namespace Kemar.HRM.API.Helpers
     {
         public static void SetUserInformation<T>(ref T model, int id, HttpContext context)
         {
-            var username = context.User?.Identity?.Name ?? "admin";
+
+            var userRole = context.User.Claims
+                .FirstOrDefault(c => c.Type == "role")?.Value ?? "HostelManager";
 
             if (id == 0)
             {
-                model.GetType().GetProperty("CreatedBy")?.SetValue(model, username);
+
+                model.GetType().GetProperty("CreatedBy")?.SetValue(model, userRole);
 
                 model.GetType().GetProperty("UpdatedBy")?.SetValue(model, null);
                 model.GetType().GetProperty("UpdatedAt")?.SetValue(model, null);
             }
             else
             {
-                model.GetType().GetProperty("UpdatedBy")?.SetValue(model, username);
+
+                model.GetType().GetProperty("UpdatedBy")?.SetValue(model, "admin");
                 model.GetType().GetProperty("UpdatedAt")?.SetValue(model, DateTime.UtcNow);
             }
         }
 
         public static IActionResult ReturnActionResultByStatus(ResultModel result, ControllerBase cntbase)
         {
-
             if (string.IsNullOrEmpty(result.Message))
             {
                 result.Message = result.StatusCode switch
@@ -45,12 +48,8 @@ namespace Kemar.HRM.API.Helpers
 
             return result.StatusCode switch
             {
-
                 ResultCode.SuccessfullyCreated => cntbase.StatusCode(201, BodyNoData()),
-
-
                 ResultCode.SuccessfullyUpdated => cntbase.StatusCode(202, BodyNoData()),
-
 
                 ResultCode.Success => result.Data != null
                     ? cntbase.Ok(BodyWithData())
@@ -58,7 +57,6 @@ namespace Kemar.HRM.API.Helpers
 
                 ResultCode.RecordNotFound => cntbase.NotFound(
                     new { statusCode = 404, message = result.Message }),
-
 
                 ResultCode.Unauthorized => cntbase.Unauthorized(
                     new { statusCode = 401, message = result.Message }),
@@ -77,7 +75,6 @@ namespace Kemar.HRM.API.Helpers
 
                 _ => cntbase.StatusCode(500,
                     new { statusCode = 500, message = "Internal server error" }),
-
             };
         }
     }

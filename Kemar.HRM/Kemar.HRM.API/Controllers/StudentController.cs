@@ -1,8 +1,8 @@
-﻿using Kemar.HRM.API.Helpers;
-using Kemar.HRM.Business.StudentBusiness;
-using Kemar.HRM.Model.Filter;
+﻿using Kemar.HRM.Business.StudentBusiness;
 using Kemar.HRM.Model.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Kemar.HRM.API.Controllers
 {
@@ -17,39 +17,50 @@ namespace Kemar.HRM.API.Controllers
             _studentManager = studentManager;
         }
 
+        private string LoggedInUser => User.FindFirstValue(ClaimTypes.Name) ?? "Unknown";
+
+        // ================================
+        // Create or Update - login required
+        // ================================
         [HttpPost("addOrUpdate")]
-        public async Task<IActionResult> AddOrUpdate([FromBody] StudentRequest request)
+        [Authorize]
+        public async Task<IActionResult> AddOrUpdateAsync([FromBody] StudentRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { statusCode = 400, message = "Invalid data model" });
-
-            CommonHelper.SetUserInformation(ref request, request.StudentId ?? 0, HttpContext);
-
-            var result = await _studentManager.AddOrUpdateAsync(request);
-            return CommonHelper.ReturnActionResultByStatus(result, this);
+            var result = await _studentManager.AddOrUpdateAsync(request, LoggedInUser);
+            return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpGet("getById/{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        // ================================
+        // Get by Id - anyone can access
+        // ================================
+        [HttpGet("getById/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             var result = await _studentManager.GetByIdAsync(id);
-            return CommonHelper.ReturnActionResultByStatus(result, this);
+            return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpPost("getByFilter")]
-        public async Task<IActionResult> GetByFilter([FromBody] StudentFilter filter)
+        // ================================
+        // Get all - login required
+        // ================================
+        [HttpGet("getAll")]
+        [Authorize]
+        public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _studentManager.GetByFilterAsync(filter);
-            return CommonHelper.ReturnActionResultByStatus(result, this);
+            var result = await _studentManager.GetAllAsync();
+            return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpDelete("delete/{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        // ================================
+        // Delete - login required
+        // ================================
+        [HttpDelete("delete/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var username = HttpContext.User?.Identity?.Name ?? "admin";
-            var result = await _studentManager.DeleteAsync(id, username);
-            return CommonHelper.ReturnActionResultByStatus(result, this);
-
+            var result = await _studentManager.DeleteAsync(id, LoggedInUser);
+            return StatusCode((int)result.StatusCode, result);
         }
     }
 }
