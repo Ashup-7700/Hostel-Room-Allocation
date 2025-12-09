@@ -801,21 +801,16 @@
             "format": "int32",
             "nullable": true
           },
-          "allocatedByUserId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
           "isActive": {
             "type": "boolean",
             "nullable": true
           },
-          "fromAllocatedAt": {
+          "fromDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "toAllocatedAt": {
+          "toDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true
@@ -824,11 +819,6 @@
         "additionalProperties": false
       },
       "RoomAllocationRequest": {
-        "required": [
-          "allocatedAt",
-          "roomId",
-          "studentId"
-        ],
         "type": "object",
         "properties": {
           "roomAllocationId": {
@@ -844,27 +834,18 @@
             "type": "integer",
             "format": "int32"
           },
-          "allocatedByUserId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
           "allocatedAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "releasedAt": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "createdBy": {
-            "type": "string",
-            "nullable": true
-          },
-          "updatedBy": {
-            "type": "string",
-            "nullable": true
+          "isActive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -933,14 +914,6 @@
             "minimum": 0,
             "type": "integer",
             "format": "int32"
-          },
-          "createdBy": {
-            "type": "string",
-            "nullable": true
-          },
-          "updatedBy": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false

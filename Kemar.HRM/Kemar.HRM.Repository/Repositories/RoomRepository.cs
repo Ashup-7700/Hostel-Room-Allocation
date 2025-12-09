@@ -2,7 +2,6 @@
 using Kemar.HRM.Model.Common;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
-using Kemar.HRM.Model.Response;
 using Kemar.HRM.Repository.Context;
 using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
@@ -23,63 +22,53 @@ namespace Kemar.HRM.Repository.Repositories
 
         public async Task<ResultModel> AddOrUpdateAsync(RoomRequest request)
         {
-            try
+            if (request.RoomId.HasValue && request.RoomId > 0)
             {
-                if (request.RoomId.HasValue && request.RoomId.Value > 0)
-                {
-                    var existing = await _context.Rooms
-                        .FirstOrDefaultAsync(r => r.RoomId == request.RoomId.Value);
+                var entity = await _context.Rooms
+                    .FirstOrDefaultAsync(r => r.RoomId == request.RoomId.Value);
 
-                    if (existing == null)
-                        return ResultModel.NotFound("Room not found");
+                if (entity == null)
+                    return ResultModel.NotFound("Room not found");
 
-                    _mapper.Map(request, existing);
+                entity.RoomNumber = request.RoomNumber;
+                entity.RoomType = request.RoomType;
+                entity.Floor = request.Floor;
+                entity.Capacity = request.Capacity;
+                entity.CurrentOccupancy = request.CurrentOccupancy;
 
-                    existing.UpdatedAt = DateTime.UtcNow;
-                    if (!string.IsNullOrWhiteSpace(request.UpdatedBy))
-                        existing.UpdatedBy = request.UpdatedBy;
+                _context.Entry(entity).State = EntityState.Modified;
 
-                    await _context.SaveChangesAsync();
-                    return ResultModel.Updated(null, "Room updated successfully");
-                }
-
-                var entity = _mapper.Map<Room>(request);
-                entity.CreatedAt = DateTime.UtcNow;
-                entity.CreatedBy = request.CreatedBy;
-                entity.IsActive = true;
-
-                await _context.Rooms.AddAsync(entity);
                 await _context.SaveChangesAsync();
 
-                return ResultModel.Created(null, "Room created successfully");
+                return ResultModel.Updated(null, "Room updated successfully");
             }
-            catch (Exception ex)
-            {
-                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.Message);
-            }
+
+            var newEntity = _mapper.Map<Room>(request);
+
+            await _context.Rooms.AddAsync(newEntity);
+            await _context.SaveChangesAsync();
+
+            return ResultModel.Created(newEntity, "Room created successfully");
         }
 
         public async Task<ResultModel> GetByIdAsync(int roomId)
         {
-            var entity = await _context.Rooms
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.RoomId == roomId);
+            var entity = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId);
 
             if (entity == null)
                 return ResultModel.NotFound("Room not found");
 
-            var dto = _mapper.Map<RoomResponse>(entity);
-            return ResultModel.Success(dto, "Room fetched successfully");
+            return ResultModel.Success(entity, "Room fetched successfully");
         }
 
         public async Task<ResultModel> GetByFilterAsync(RoomFilter filter)
         {
-            var query = _context.Rooms.AsNoTracking().AsQueryable();
+            var query = _context.Rooms.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(filter.RoomType))
-                query = query.Where(r => r.RoomType.Contains(filter.RoomType));
+            if (!string.IsNullOrEmpty(filter.RoomType))
+                query = query.Where(r => r.RoomType == filter.RoomType);
 
-            if (!string.IsNullOrWhiteSpace(filter.RoomNumber))
+            if (!string.IsNullOrEmpty(filter.RoomNumber))
                 query = query.Where(r => r.RoomNumber.Contains(filter.RoomNumber));
 
             if (filter.Floor.HasValue)
@@ -90,40 +79,40 @@ namespace Kemar.HRM.Repository.Repositories
 
             var list = await query.ToListAsync();
 
-            return ResultModel.Success(
-                _mapper.Map<List<RoomResponse>>(list),
-                "Room list fetched successfully"
-            );
+            return ResultModel.Success(list, "Rooms fetched successfully");
         }
 
-        public async Task<ResultModel> DeleteAsync(int roomId, string deletedBy = null)
+        public async Task<ResultModel> DeleteAsync(int roomId, string deletedBy)
         {
-            var existing = await _context.Rooms
-                .FirstOrDefaultAsync(r => r.RoomId == roomId);
+            var entity = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId);
 
-            if (existing == null)
+            if (entity == null)
                 return ResultModel.NotFound("Room not found");
 
-            existing.IsActive = false;
-            existing.UpdatedAt = DateTime.UtcNow;
+            entity.IsActive = false;
 
-            if (!string.IsNullOrWhiteSpace(deletedBy))
-                existing.UpdatedBy = deletedBy;
+            entity.UpdatedBy = deletedBy;
+            _context.Entry(entity).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
 
             return ResultModel.Success(null, "Room deleted successfully");
         }
 
-        public async Task<bool> ExistsByRoomNumberAsync(string roomNumber, int? excludingRoomId = null)
-        {
-            roomNumber = (roomNumber ?? string.Empty).Trim().ToLower();
 
-            return await _context.Rooms
-                .AnyAsync(r =>
-                    r.RoomNumber.Trim().ToLower() == roomNumber &&
-                    (excludingRoomId == null || r.RoomId != excludingRoomId.Value)
-                );
+
+        public async Task<bool> UpdateCurrentOccupancyAsync(int roomId, int newOccupancy)
+        {
+            var room = await _context.Rooms.FindAsync(roomId);
+            if (room == null)
+                return false;
+
+            room.CurrentOccupancy = newOccupancy;
+            room.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
         }
+
     }
 }

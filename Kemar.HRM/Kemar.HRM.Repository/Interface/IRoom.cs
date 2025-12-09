@@ -10,7 +10,9 @@ namespace Kemar.HRM.Repository.Interface
         Task<ResultModel> GetByIdAsync(int roomId);
         Task<ResultModel> GetByFilterAsync(RoomFilter filter);
         Task<ResultModel> DeleteAsync(int roomId, string deletedBy);
-        Task<bool> ExistsByRoomNumberAsync(string roomNumber, int? roomId);
+
+        Task<bool> UpdateCurrentOccupancyAsync(int roomId, int newOccupancy);
+
 
     }
 }

@@ -21,49 +21,61 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
-        public async Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request)
+        public async Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request, string username)
         {
             try
             {
+                RoomAllocation entity;
+
                 if (request.RoomAllocationId.HasValue && request.RoomAllocationId.Value > 0)
                 {
-                    var existing = await _context.RoomAllocations
-                        .FirstOrDefaultAsync(ra => ra.RoomAllocationId == request.RoomAllocationId.Value);
+                    // Update
+                    entity = await _context.RoomAllocations
+                        .FirstOrDefaultAsync(r => r.RoomAllocationId == request.RoomAllocationId.Value);
+                    if (entity == null) return ResultModel.NotFound("Room allocation not found");
 
-                    if (existing == null)
-                        return ResultModel.NotFound("Room allocation not found");
+                    int oldRoomId = entity.RoomId;
+                    int newRoomId = request.RoomId;
 
-                    _mapper.Map(request, existing);
-
-                    existing.UpdatedAt = DateTime.UtcNow;
-                    if (!string.IsNullOrWhiteSpace(request.UpdatedBy))
-                        existing.UpdatedBy = request.UpdatedBy;
-
-                    await _context.SaveChangesAsync();
-
-                    return ResultModel.Updated(null, "Room allocation updated successfully");
-                }
-                else
-                {
-                    if (await ExistsActiveAllocationAsync(request.StudentId, request.RoomId))
+                    // Room changed
+                    if (oldRoomId != newRoomId)
                     {
-                        return ResultModel.Failure(ResultCode.DuplicateRecord, "Active allocation already exists for this student-room");
+                        await DecreaseOccupancy(oldRoomId);
+                        await IncreaseOccupancy(newRoomId);
                     }
 
-                    var entity = _mapper.Map<RoomAllocation>(request);
+                    // Student released
+                    if (entity.ReleasedAt == null && request.ReleasedAt != null)
+                        await DecreaseOccupancy(entity.RoomId);
 
-                    entity.CreatedAt = DateTime.UtcNow;
-                    entity.CreatedBy = request.CreatedBy;
-                    entity.IsActive = true;
+                    entity.StudentId = request.StudentId;
+                    entity.RoomId = request.RoomId;
+                    entity.ReleasedAt = request.ReleasedAt;
+                    entity.UpdatedAt = DateTime.UtcNow;
+                    entity.UpdatedBy = username;
 
-                    if (request.AllocatedByUserId.HasValue)
-                        entity.AllocatedByUserId = request.AllocatedByUserId.Value;
-
-                    await _context.RoomAllocations.AddAsync(entity);
+                    _context.RoomAllocations.Update(entity);
                     await _context.SaveChangesAsync();
 
-                    return ResultModel.Created(null, "Room allocation created successfully");
+                    var dto = _mapper.Map<RoomAllocationResponse>(entity);
+                    return ResultModel.Updated(dto, "Room allocation updated successfully");
                 }
+
+                // Create
+                entity = _mapper.Map<RoomAllocation>(request);
+                entity.AllocatedAt = DateTime.UtcNow;
+                entity.AllocatedByUserId = request.AllocatedByUserId ?? 0;
+                entity.CreatedBy = username;
+                entity.IsActive = true;
+
+                await _context.RoomAllocations.AddAsync(entity);
+                await _context.SaveChangesAsync();
+
+                // Increase room occupancy
+                await IncreaseOccupancy(entity.RoomId);
+
+                var created = _mapper.Map<RoomAllocationResponse>(entity);
+                return ResultModel.Created(created, "Room allocation created successfully");
             }
             catch (Exception ex)
             {
@@ -71,17 +83,16 @@ namespace Kemar.HRM.Repository.Repositories
             }
         }
 
-        public async Task<ResultModel> GetByIdAsync(int allocationId)
+        public async Task<ResultModel> GetByIdAsync(int id)
         {
             var entity = await _context.RoomAllocations
+                .Include(r => r.Student)
+                .Include(r => r.Room)
+                .Include(r => r.AllocatedBy)
                 .AsNoTracking()
-                .Include(ra => ra.Student)
-                .Include(ra => ra.Room)
-                .Include(ra => ra.AllocatedBy)
-                .FirstOrDefaultAsync(ra => ra.RoomAllocationId == allocationId);
+                .FirstOrDefaultAsync(r => r.RoomAllocationId == id);
 
-            if (entity == null)
-                return ResultModel.NotFound("Room allocation not found");
+            if (entity == null) return ResultModel.NotFound("Room allocation not found");
 
             var dto = _mapper.Map<RoomAllocationResponse>(entity);
             return ResultModel.Success(dto, "Room allocation fetched successfully");
@@ -90,57 +101,69 @@ namespace Kemar.HRM.Repository.Repositories
         public async Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter)
         {
             var query = _context.RoomAllocations
-                .AsNoTracking()
-                .Include(ra => ra.Student)
-                .Include(ra => ra.Room)
-                .Include(ra => ra.AllocatedBy)
+                .Include(r => r.Student)
+                .Include(r => r.Room)
+                .Include(r => r.AllocatedBy)
                 .AsQueryable();
 
-            if (filter.StudentId.HasValue)
-                query = query.Where(ra => ra.StudentId == filter.StudentId.Value);
-
-            if (filter.RoomId.HasValue)
-                query = query.Where(ra => ra.RoomId == filter.RoomId.Value);
-
-            if (filter.AllocatedByUserId.HasValue)
-                query = query.Where(ra => ra.AllocatedByUserId == filter.AllocatedByUserId.Value);
-
-            if (filter.IsActive.HasValue)
-                query = query.Where(ra => ra.IsActive == filter.IsActive.Value);
-
-            if (filter.FromAllocatedAt.HasValue)
-                query = query.Where(ra => ra.AllocatedAt >= filter.FromAllocatedAt.Value);
-
-            if (filter.ToAllocatedAt.HasValue)
-                query = query.Where(ra => ra.AllocatedAt <= filter.ToAllocatedAt.Value);
+            if (filter.StudentId.HasValue) query = query.Where(q => q.StudentId == filter.StudentId.Value);
+            if (filter.RoomId.HasValue) query = query.Where(q => q.RoomId == filter.RoomId.Value);
+            if (filter.IsActive.HasValue) query = query.Where(q => q.IsActive == filter.IsActive.Value);
 
             var list = await query.ToListAsync();
+            var dto = _mapper.Map<List<RoomAllocationResponse>>(list);
 
-            var dtoList = _mapper.Map<List<RoomAllocationResponse>>(list);
-            return ResultModel.Success(dtoList, "Room allocation list fetched successfully");
+            return ResultModel.Success(dto, "Room allocations fetched successfully");
         }
 
-        public async Task<ResultModel> DeleteAsync(int allocationId, string deletedBy = null)
+        public async Task<ResultModel> DeleteAsync(int id, string username)
         {
-            var existing = await _context.RoomAllocations.FirstOrDefaultAsync(ra => ra.RoomAllocationId == allocationId);
-            if (existing == null)
-                return ResultModel.NotFound("Room allocation not found");
+            var entity = await _context.RoomAllocations.FirstOrDefaultAsync(r => r.RoomAllocationId == id);
+            if (entity == null) return ResultModel.NotFound("Room allocation not found");
 
-            existing.IsActive = false;
-            existing.UpdatedAt = DateTime.UtcNow;
-            if (!string.IsNullOrWhiteSpace(deletedBy))
-                existing.UpdatedBy = deletedBy;
+            if (entity.ReleasedAt == null)
+                await DecreaseOccupancy(entity.RoomId);
 
+            entity.IsActive = false;
+            entity.ReleasedAt = DateTime.UtcNow;
+            entity.UpdatedBy = username;
+            entity.UpdatedAt = DateTime.UtcNow;
+
+            _context.RoomAllocations.Update(entity);
             await _context.SaveChangesAsync();
 
             return ResultModel.Success(null, "Room allocation deleted successfully");
         }
 
-        public async Task<bool> ExistsActiveAllocationAsync(int studentId, int roomId)
+        public async Task<RoomAllocation?> GetActiveByStudentIdAsync(int studentId)
         {
             return await _context.RoomAllocations
-                .AnyAsync(ra => ra.StudentId == studentId && ra.RoomId == roomId && ra.IsActive);
+                .Where(r => r.StudentId == studentId && r.IsActive && r.ReleasedAt == null)
+                .FirstOrDefaultAsync();
+        }
 
+        private async Task IncreaseOccupancy(int roomId)
+        {
+            var room = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId);
+            if (room != null)
+            {
+                room.CurrentOccupancy += 1;
+                room.UpdatedAt = DateTime.UtcNow;
+                _context.Rooms.Update(room);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task DecreaseOccupancy(int roomId)
+        {
+            var room = await _context.Rooms.FirstOrDefaultAsync(r => r.RoomId == roomId);
+            if (room != null && room.CurrentOccupancy > 0)
+            {
+                room.CurrentOccupancy -= 1;
+                room.UpdatedAt = DateTime.UtcNow;
+                _context.Rooms.Update(room);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

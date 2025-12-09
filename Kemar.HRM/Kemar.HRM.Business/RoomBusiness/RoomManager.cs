@@ -7,37 +7,38 @@ namespace Kemar.HRM.Business.RoomBusiness
 {
     public class RoomManager : IRoomManager
     {
-        private readonly IRoom _repo;
+        private readonly IRoom _repository;
 
-        public RoomManager(IRoom repo)
+        public RoomManager(IRoom repository)
         {
-            _repo = repo;
+            _repository = repository;
         }
 
         public async Task<ResultModel> AddOrUpdateAsync(RoomRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.RoomNumber))
-                return ResultModel.Failure(ResultCode.Invalid, "Room Number is required");
+            if (request.Capacity <= 0)
+                return ResultModel.Failure(ResultCode.Invalid , "Room capacity must be greater than 0");
 
-            var exists = await _repo.ExistsByRoomNumberAsync(
-                request.RoomNumber,
-                request.RoomId
-            );
-
-            if (exists)
-                return ResultModel.Failure(ResultCode.DuplicateRecord, "Room number already exists");
-
-            return await _repo.AddOrUpdateAsync(request);
+            var result = await _repository.AddOrUpdateAsync(request);
+            return result;
         }
 
-        public Task<ResultModel> DeleteAsync(int roomId, string deleteBy)
-            => _repo.DeleteAsync(roomId, deleteBy);
+        public async Task<ResultModel> GetByIdAsync(int id)
+        {
+            var result = await _repository.GetByIdAsync(id);
+            return result;
+        }
 
-        public Task<ResultModel> GetByFilterAsync(RoomFilter filter)
-            => _repo.GetByFilterAsync(filter);
+        public async Task<ResultModel> GetByFilterAsync(RoomFilter filter)
+        {
+            var result = await _repository.GetByFilterAsync(filter);
+            return result;
+        }
 
-        public Task<ResultModel> GetByIdAsync(int roomId)
-            => _repo.GetByIdAsync(roomId);
-
+        public async Task<ResultModel> DeleteAsync(int id, string username)
+        {
+            var result = await _repository.DeleteAsync(id, username);
+            return result;
+        }
     }
 }

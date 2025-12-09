@@ -19,9 +19,6 @@ namespace Kemar.HRM.API.Controllers
 
         private string LoggedInUser => User.FindFirstValue(ClaimTypes.Name) ?? "Unknown";
 
-        // ================================
-        // Create or Update - login required
-        // ================================
         [HttpPost("addOrUpdate")]
         [Authorize]
         public async Task<IActionResult> AddOrUpdateAsync([FromBody] StudentRequest request)
@@ -30,9 +27,6 @@ namespace Kemar.HRM.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        // ================================
-        // Get by Id - anyone can access
-        // ================================
         [HttpGet("getById/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetByIdAsync(int id)
@@ -41,9 +35,6 @@ namespace Kemar.HRM.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        // ================================
-        // Get all - login required
-        // ================================
         [HttpGet("getAll")]
         [Authorize]
         public async Task<IActionResult> GetAllAsync()
@@ -52,9 +43,6 @@ namespace Kemar.HRM.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        // ================================
-        // Delete - login required
-        // ================================
         [HttpDelete("delete/{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteAsync(int id)

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kemar.HRM.Repository.Migrations
 {
     [DbContext(typeof(HostelDbContext))]
-    [Migration("20251208095601_Init")]
+    [Migration("20251209050822_Init")]
     partial class Init
     {
         /// <inheritdoc />

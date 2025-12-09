@@ -22,20 +22,17 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
-        // Add or update a user
         public async Task<ResultModel> AddOrUpdateAsync(UserRequest request)
         {
             try
             {
-                // UPDATE
                 if (request.UserId > 0)
                 {
                     var existing = await _context.Users.FirstOrDefaultAsync(u => u.UserId == request.UserId);
                     if (existing == null)
                         return ResultModel.NotFound("User not found");
 
-                    // Update all fields
-                    existing.Username = request.Username;         // ✅ ADDED
+                    existing.Username = request.Username;        
                     existing.FullName = request.FullName;
                     existing.Role = request.Role;
                     existing.IsActive = request.IsActive ?? existing.IsActive;
@@ -50,7 +47,6 @@ namespace Kemar.HRM.Repository.Repositories
                     return ResultModel.Updated(null, "User updated successfully");
                 }
 
-                // CREATE
                 var user = _mapper.Map<User>(request);
                 user.Password = HashPassword(request.Password);
                 user.CreatedAt = DateTime.UtcNow;
@@ -69,7 +65,6 @@ namespace Kemar.HRM.Repository.Repositories
                 return ResultModel.Failure(ResultCode.ExceptionThrown, ex.Message);
             }
         }
-
 
         public async Task<ResultModel> GetByFilterAsync(UserFilter filter)
         {
@@ -91,8 +86,6 @@ namespace Kemar.HRM.Repository.Repositories
             return ResultModel.Success(dto, "Filtered user list fetched successfully");
         }
 
-
-        // Get a single user by ID
         public async Task<ResultModel> GetByIdAsync(int userId)
         {
             var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == userId);
@@ -102,7 +95,6 @@ namespace Kemar.HRM.Repository.Repositories
             return ResultModel.Success(dto, "User fetched successfully");
         }
 
-        // Get all users
         public async Task<ResultModel> GetAllAsync()
         {
             var list = await _context.Users.AsNoTracking().ToListAsync();
@@ -110,7 +102,6 @@ namespace Kemar.HRM.Repository.Repositories
             return ResultModel.Success(dto, "User list fetched successfully");
         }
 
-        // Soft delete
         public async Task<ResultModel> DeleteAsync(int userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -124,7 +115,6 @@ namespace Kemar.HRM.Repository.Repositories
             return ResultModel.Success(null, "User deleted successfully");
         }
 
-        // Authenticate user
         public async Task<User?> AuthenticateAsync(string username, string password)
         {
             var hashed = HashPassword(password);
@@ -132,7 +122,6 @@ namespace Kemar.HRM.Repository.Repositories
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == hashed && u.IsActive);
         }
 
-        // SHA256 password hashing
         private string HashPassword(string password)
         {
             using var sha256 = SHA256.Create();

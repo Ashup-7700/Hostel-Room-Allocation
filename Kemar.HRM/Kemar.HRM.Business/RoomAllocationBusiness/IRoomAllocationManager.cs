@@ -7,9 +7,8 @@ namespace Kemar.HRM.Business.RoomAllocationBusiness
     public interface IRoomAllocationManager
     {
         Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request);
-        Task<ResultModel> GetByIdAsync(int allocationId);
+        Task<ResultModel> GetByIdAsync(int id);
         Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter);
-        Task<ResultModel> DeleteAsync(int allocationId, string deletedBy = null);
-
+        Task<ResultModel> DeleteAsync(int id);
     }
 }

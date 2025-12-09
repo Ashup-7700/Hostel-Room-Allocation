@@ -9,7 +9,6 @@ namespace Kemar.HRM.Business.RoomBusiness
         Task<ResultModel> AddOrUpdateAsync(RoomRequest request);
         Task<ResultModel> GetByIdAsync(int roomId);
         Task<ResultModel> GetByFilterAsync(RoomFilter filter);
-        Task<ResultModel> DeleteAsync(int roomId, string deleteBy);
-
+        Task<ResultModel> DeleteAsync(int roomId, string username);
     }
 }

@@ -25,19 +25,16 @@ namespace Kemar.HRM.Business.UserBusiness
             _config = config;
         }
 
-        // Register or Update User
         public async Task<ResultModel> AddOrUpdateAsync(UserRequest request)
         {
             return await _userRepo.AddOrUpdateAsync(request);
         }
 
-        // Get Users by filter
         public async Task<ResultModel> GetByFilterAsync(UserFilter filter)
         {
             return await _userRepo.GetByFilterAsync(filter);
         }
 
-        // Authenticate user and save token
         public async Task<ResultModel> AuthenticateAsync(UserLoginRequest request)
         {
             var user = await _userRepo.AuthenticateAsync(request.Username, request.Password);
@@ -45,15 +42,12 @@ namespace Kemar.HRM.Business.UserBusiness
             if (user == null)
                 return ResultModel.Failure(ResultCode.Invalid, "Invalid username or password");
 
-            // Generate JWT token
             var token = GenerateJwtToken(user);
             var generatedAt = DateTime.UtcNow;
-            var expiresAt = generatedAt.AddMinutes(40); // Token expiry
+            var expiresAt = generatedAt.AddMinutes(40); 
 
-            // Save token in UserToken table
             await _userTokenManager.CreateTokenAsync(user.UserId, token, GetClientIp(), expiresAt);
 
-            // Prepare response
             var response = new UserLoginResponse
             {
                 Token = token,
@@ -68,7 +62,6 @@ namespace Kemar.HRM.Business.UserBusiness
             return ResultModel.Success(response, "Authentication successful");
         }
 
-        // JWT token generation
         private string GenerateJwtToken(User user)
         {
             var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"] ?? "ThisIsASecretKey12345");
@@ -92,13 +85,11 @@ namespace Kemar.HRM.Business.UserBusiness
             return tokenHandler.WriteToken(token);
         }
 
-        // Get User by Id
         public async Task<ResultModel> GetByIdAsync(int userId)
         {
             return await _userRepo.GetByIdAsync(userId);
         }
 
-        // Delete User
         public async Task<ResultModel> DeleteAsync(int userId)
         {
             var result = await _userRepo.DeleteAsync(userId);
@@ -108,10 +99,9 @@ namespace Kemar.HRM.Business.UserBusiness
             return ResultModel.Success(null, "User deleted successfully");
         }
 
-        // Get client IP (placeholder, replace with actual logic)
         private string GetClientIp()
         {
-            return "127.0.0.1"; // or use HttpContext if available
+            return "127.0.0.1"; 
         }
     }
 }

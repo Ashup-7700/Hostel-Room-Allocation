@@ -2,60 +2,42 @@
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Repository.Interface;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Kemar.HRM.Business.RoomAllocationBusiness
 {
     public class RoomAllocationManager : IRoomAllocationManager
     {
-        private readonly IRoomAllocation _repo;
+        private readonly IRoomAllocation _repository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RoomAllocationManager(IRoomAllocation repo)
+        public RoomAllocationManager(IRoomAllocation repository, IHttpContextAccessor httpContextAccessor)
         {
-            _repo = repo;
+            _repository = repository;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private string GetCurrentUser() => _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "system";
+
+        private int GetCurrentUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User?.Claims
+                .FirstOrDefault(c => c.Type == "userId" || c.Type == ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
         }
 
         public async Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request)
         {
-            if (request == null)
-                return ResultModel.Failure(ResultCode.Invalid, "Invalid request");
-
-            if (request.StudentId <= 0)
-                return ResultModel.Failure(ResultCode.Invalid, "StudentId is required");
-
-            if (request.RoomId <= 0)
-                return ResultModel.Failure(ResultCode.Invalid, "RoomId is required");
-
-            if (request.AllocatedAt == default)
-                return ResultModel.Failure(ResultCode.Invalid, "AllocatedAt is required");
-
-            var exists = await _repo.ExistsActiveAllocationAsync(request.StudentId, request.RoomId);
-            if (exists && (!request.RoomAllocationId.HasValue || request.RoomAllocationId.Value == 0))
-                return ResultModel.Failure(ResultCode.DuplicateRecord, "Active allocation already exists for this student in this room");
-
-            return await _repo.AddOrUpdateAsync(request);
+            request.IsActive = true;
+            request.AllocatedByUserId = GetCurrentUserId();
+            return await _repository.AddOrUpdateAsync(request, GetCurrentUser());
         }
 
-        public async Task<ResultModel> GetByIdAsync(int allocationId)
-        {
-            if (allocationId <= 0)
-                return ResultModel.Failure(ResultCode.Invalid, "Invalid allocation id");
+        public async Task<ResultModel> GetByIdAsync(int id) => await _repository.GetByIdAsync(id);
 
-            return await _repo.GetByIdAsync(allocationId);
-        }
+        public async Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter) => await _repository.GetByFilterAsync(filter);
 
-        public async Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter)
-        {
-            filter ??= new RoomAllocationFilter();
-            return await _repo.GetByFilterAsync(filter);
-        }
-
-        public async Task<ResultModel> DeleteAsync(int allocationId, string deletedBy = null)
-        {
-            if (allocationId <= 0)
-                return ResultModel.Failure(ResultCode.Invalid, "Invalid allocation id");
-
-            return await _repo.DeleteAsync(allocationId, deletedBy);
-
-        }
+        public async Task<ResultModel> DeleteAsync(int id) => await _repository.DeleteAsync(id, GetCurrentUser());
     }
 }

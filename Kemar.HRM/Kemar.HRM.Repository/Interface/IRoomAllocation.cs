@@ -1,16 +1,16 @@
 ﻿using Kemar.HRM.Model.Common;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
+using Kemar.HRM.Repository.Entity;
 
 namespace Kemar.HRM.Repository.Interface
 {
     public interface IRoomAllocation
     {
-        Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request);
-        Task<ResultModel> GetByIdAsync(int allocationId);
+        Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request, string username);
+        Task<ResultModel> GetByIdAsync(int id);
         Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter);
-        Task<ResultModel> DeleteAsync(int allocationId, string deletedBy = null);
-        Task<bool> ExistsActiveAllocationAsync(int studentId, int roomId);
-
+        Task<ResultModel> DeleteAsync(int id, string username);
+        Task<RoomAllocation?> GetActiveByStudentIdAsync(int studentId);
     }
 }

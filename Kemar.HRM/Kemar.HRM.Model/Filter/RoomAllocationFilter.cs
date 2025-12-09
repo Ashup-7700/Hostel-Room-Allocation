@@ -4,11 +4,8 @@
     {
         public int? StudentId { get; set; }
         public int? RoomId { get; set; }
-        public int? AllocatedByUserId { get; set; }
-        public bool? IsActive { get; set; }
-
-        public DateTime? FromAllocatedAt { get; set; }
-        public DateTime? ToAllocatedAt { get; set; }
-
+        public bool? IsActive { get; set; }  // active allocations
+        public DateTime? FromDate { get; set; } // allocation date range
+        public DateTime? ToDate { get; set; }
     }
 }

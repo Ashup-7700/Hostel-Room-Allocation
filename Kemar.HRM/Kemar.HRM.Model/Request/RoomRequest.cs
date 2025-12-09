@@ -26,8 +26,7 @@ namespace Kemar.HRM.Model.Request
         [Range(0, 100, ErrorMessage = "Current occupancy must be valid.")]
         public int CurrentOccupancy { get; set; } = 0;
 
-        public string? CreatedBy { get; set; }
-        public string? UpdatedBy { get; set; }
+
 
     }
 }

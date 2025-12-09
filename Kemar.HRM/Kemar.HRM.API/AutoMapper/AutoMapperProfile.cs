@@ -32,18 +32,13 @@ namespace Kemar.HRM.API.AutoMapper
             #endregion
 
             #region RoomAllocation
-
             CreateMap<RoomAllocationRequest, RoomAllocation>()
-                .ForMember(dest => dest.RoomAllocationId, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore());
+                .ForMember(dest => dest.RoomAllocationId, opt => opt.MapFrom(src => src.RoomAllocationId ?? 0));
 
             CreateMap<RoomAllocation, RoomAllocationResponse>()
-                .ForMember(dest => dest.Student, opt => opt.MapFrom(src => src.Student))
-                .ForMember(dest => dest.Room, opt => opt.MapFrom(src => src.Room))
-                .ForMember(dest => dest.AllocatedBy, opt => opt.MapFrom(src => src.AllocatedBy));
+                .ForMember(dest => dest.AllocatedBy, opt => opt.Ignore());
+
+
 
             #endregion
 

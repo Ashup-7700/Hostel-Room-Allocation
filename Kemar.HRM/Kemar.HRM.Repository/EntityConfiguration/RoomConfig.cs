@@ -12,8 +12,8 @@ namespace Kemar.HRM.Repository.EntityConfiguration
             base.Configure(builder);
 
             builder.Property(x => x.RoomId).ValueGeneratedOnAdd();
-            builder.Property(r => r.RoomNumber).IsRequired().HasMaxLength(10);
-            builder.Property(r => r.RoomType).IsRequired().HasMaxLength(20);
+            builder.Property(r => r.RoomNumber).IsRequired().HasMaxLength(20);
+            builder.Property(r => r.RoomType).IsRequired().HasMaxLength(50);
             builder.Property(r => r.Floor).IsRequired();
             builder.Property(r => r.Capacity).IsRequired();
             builder.Property(r => r.CurrentOccupancy).IsRequired();
