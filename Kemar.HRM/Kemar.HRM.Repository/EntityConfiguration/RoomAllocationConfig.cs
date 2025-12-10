@@ -9,25 +9,35 @@ namespace Kemar.HRM.Repository.EntityConfiguration
     {
         public override void Configure(EntityTypeBuilder<RoomAllocation> builder)
         {
-            builder.ToTable("RoomAllocations");
+            base.Configure(builder);
 
-            builder.HasKey(r => r.RoomAllocationId);
-            builder.Property(r => r.RoomAllocationId).ValueGeneratedOnAdd();
+            builder.Property(ra => ra.RoomAllocationId).ValueGeneratedOnAdd();
 
-            builder.Property(r => r.StudentId).IsRequired();
-            builder.Property(r => r.RoomId).IsRequired();
-            builder.Property(r => r.AllocatedByUserId).IsRequired();
-            builder.Property(r => r.AllocatedAt).IsRequired();
-            builder.Property(r => r.ReleasedAt).IsRequired(false);
+            builder.HasOne(ra => ra.Student)
+                   .WithMany(s => s.RoomAllocations)
+                   .HasForeignKey(ra => ra.StudentId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(r => r.Student).WithMany(s => s.RoomAllocations)
-                   .HasForeignKey(r => r.StudentId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(ra => ra.Room)
+                   .WithMany(r => r.RoomAllocations)
+                   .HasForeignKey(ra => ra.RoomId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(r => r.Room).WithMany(rm => rm.RoomAllocations)
-                   .HasForeignKey(r => r.RoomId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(ra => ra.AllocatedByUser)
+                   .WithMany(u => u.AllocationsHandled)
+                   .HasForeignKey(ra => ra.AllocatedByUserId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(r => r.AllocatedBy).WithMany()
-                   .HasForeignKey(r => r.AllocatedByUserId).OnDelete(DeleteBehavior.Restrict);
+            builder.Property(ra => ra.AllocatedAt)
+                   .IsRequired()
+                   .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(ra => ra.ReleasedAt)
+                   .IsRequired(false);
+
+            builder.Property(ra => ra.IsActive)
+                   .IsRequired()
+                   .HasDefaultValue(true);
         }
     }
 }

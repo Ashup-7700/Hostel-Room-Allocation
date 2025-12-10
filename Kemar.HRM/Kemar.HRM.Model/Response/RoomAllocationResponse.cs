@@ -5,15 +5,14 @@
         public int RoomAllocationId { get; set; }
         public int StudentId { get; set; }
         public int RoomId { get; set; }
-        public int AllocatedByUserId { get; set; }
-        public string? AllocatedBy { get; set; }
-        public DateTime AllocatedAt { get; set; }
-        public DateTime? ReleasedAt { get; set; }
 
-        public string? CreatedBy { get; set; }
-        public string? UpdatedBy { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime? AllocatedAt { get; set; }
+        public DateTime? ReleasedAt { get; set; }
         public bool IsActive { get; set; }
+
+        public string StudentName { get; set; } = string.Empty;
+        public string RoomNumber { get; set; } = string.Empty;
+
+        public string AllocatedByUsername { get; set; } = string.Empty;
     }
 }

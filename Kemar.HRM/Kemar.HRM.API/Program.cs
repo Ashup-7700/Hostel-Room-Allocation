@@ -13,9 +13,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<HostelDbContext>(options =>
@@ -44,6 +46,7 @@ builder.Services.AddScoped<IPaymentManager, PaymentManager>();
 builder.Services.AddScoped<IFeeStructure, FeeStructureRepository>();
 builder.Services.AddScoped<IFeeStructureManager, FeeStructureManager>();
 
+
 builder.Services.AddControllers();
 
 var jwtKey = builder.Configuration["Jwt:Key"];
@@ -57,15 +60,22 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+
+        NameClaimType = "UserId",
+        RoleClaimType = ClaimTypes.Role
     };
 });
 
@@ -81,16 +91,14 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your valid JWT token.",
-    };
-
-    var securityRequirement = new OpenApiSecurityRequirement
-    {
-        { securityScheme, new string[] { } }
+        Description = "Enter: Bearer {your token}"
     };
 
     c.AddSecurityDefinition("Bearer", securityScheme);
-    c.AddSecurityRequirement(securityRequirement);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityScheme, new string[] { } }
+    });
 });
 
 var app = builder.Build();
@@ -103,7 +111,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

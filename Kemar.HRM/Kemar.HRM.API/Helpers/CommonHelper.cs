@@ -1,5 +1,8 @@
 ﻿using Kemar.HRM.Model.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
 
 namespace Kemar.HRM.API.Helpers
 {
@@ -7,27 +10,31 @@ namespace Kemar.HRM.API.Helpers
     {
         public static void SetUserInformation<T>(ref T model, int id, HttpContext context)
         {
-
             var userRole = context.User.Claims
                 .FirstOrDefault(c => c.Type == "role")?.Value ?? "HostelManager";
 
-            if (id == 0)
+            var userIdClaim = context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            int userId = userIdClaim != null ? int.Parse(userIdClaim) : 0;
+
+            var modelType = model.GetType();
+
+            if (id == 0) // New record
             {
-
-                model.GetType().GetProperty("CreatedBy")?.SetValue(model, userRole);
-
-                model.GetType().GetProperty("UpdatedBy")?.SetValue(model, null);
-                model.GetType().GetProperty("UpdatedAt")?.SetValue(model, null);
+                modelType.GetProperty("CreatedBy")?.SetValue(model, userRole);
+                modelType.GetProperty("CreatedByUserId")?.SetValue(model, userId);
+                modelType.GetProperty("UpdatedBy")?.SetValue(model, null);
+                modelType.GetProperty("UpdatedByUserId")?.SetValue(model, null);
+                modelType.GetProperty("UpdatedAt")?.SetValue(model, null);
             }
-            else
+            else // Update existing record
             {
-
-                model.GetType().GetProperty("UpdatedBy")?.SetValue(model, "admin");
-                model.GetType().GetProperty("UpdatedAt")?.SetValue(model, DateTime.UtcNow);
+                modelType.GetProperty("UpdatedBy")?.SetValue(model, "admin");
+                modelType.GetProperty("UpdatedByUserId")?.SetValue(model, userId);
+                modelType.GetProperty("UpdatedAt")?.SetValue(model, DateTime.UtcNow);
             }
         }
 
-        public static IActionResult ReturnActionResultByStatus(ResultModel result, ControllerBase cntbase)
+        public static IActionResult ReturnActionResultByStatus(ResultModel result, ControllerBase controller)
         {
             if (string.IsNullOrEmpty(result.Message))
             {
@@ -39,6 +46,9 @@ namespace Kemar.HRM.API.Helpers
                     ResultCode.RecordNotFound => "Record not found",
                     ResultCode.DuplicateRecord => "Duplicate record",
                     ResultCode.Invalid => "Invalid request",
+                    ResultCode.NotAllowed => "Action not allowed",
+                    ResultCode.Unauthorized => "Unauthorized",
+                    ResultCode.ExceptionThrown => "Internal server error",
                     _ => "Success"
                 };
             }
@@ -48,33 +58,16 @@ namespace Kemar.HRM.API.Helpers
 
             return result.StatusCode switch
             {
-                ResultCode.SuccessfullyCreated => cntbase.StatusCode(201, BodyNoData()),
-                ResultCode.SuccessfullyUpdated => cntbase.StatusCode(202, BodyNoData()),
-
-                ResultCode.Success => result.Data != null
-                    ? cntbase.Ok(BodyWithData())
-                    : cntbase.Ok(BodyNoData()),
-
-                ResultCode.RecordNotFound => cntbase.NotFound(
-                    new { statusCode = 404, message = result.Message }),
-
-                ResultCode.Unauthorized => cntbase.Unauthorized(
-                    new { statusCode = 401, message = result.Message }),
-
-                ResultCode.DuplicateRecord => cntbase.Conflict(
-                    new { statusCode = 409, message = result.Message }),
-
-                ResultCode.Invalid => cntbase.BadRequest(
-                    new { statusCode = 400, message = result.Message }),
-
-                ResultCode.NotAllowed => cntbase.StatusCode(405,
-                    new { statusCode = 405, message = result.Message }),
-
-                ResultCode.ExceptionThrown => cntbase.StatusCode(500,
-                    new { statusCode = 500, message = result.Message }),
-
-                _ => cntbase.StatusCode(500,
-                    new { statusCode = 500, message = "Internal server error" }),
+                ResultCode.SuccessfullyCreated => controller.StatusCode(201, BodyNoData()),
+                ResultCode.SuccessfullyUpdated => controller.StatusCode(202, BodyNoData()),
+                ResultCode.Success => result.Data != null ? controller.Ok(BodyWithData()) : controller.Ok(BodyNoData()),
+                ResultCode.RecordNotFound => controller.NotFound(BodyNoData()),
+                ResultCode.Unauthorized => controller.Unauthorized(BodyNoData()),
+                ResultCode.DuplicateRecord => controller.Conflict(BodyNoData()),
+                ResultCode.Invalid => controller.BadRequest(BodyNoData()),
+                ResultCode.NotAllowed => controller.StatusCode(405, BodyNoData()),
+                ResultCode.ExceptionThrown => controller.StatusCode(500, BodyNoData()),
+                _ => controller.StatusCode(500, new { statusCode = 500, message = "Internal server error" }),
             };
         }
     }

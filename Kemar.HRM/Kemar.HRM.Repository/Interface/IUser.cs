@@ -1,7 +1,6 @@
 ﻿using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Common;
-using Kemar.HRM.Model.Filter;
 
 namespace Kemar.HRM.Repository.Interface
 {

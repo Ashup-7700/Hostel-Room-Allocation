@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kemar.HRM.Repository.Migrations
 {
     [DbContext(typeof(HostelDbContext))]
-    [Migration("20251209050822_Init")]
+    [Migration("20251210101239_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -146,13 +146,13 @@ namespace Kemar.HRM.Repository.Migrations
 
                     b.Property<string>("RoomNumber")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("RoomType")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -175,7 +175,9 @@ namespace Kemar.HRM.Repository.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomAllocationId"));
 
                     b.Property<DateTime>("AllocatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<int>("AllocatedByUserId")
                         .HasColumnType("int");
@@ -188,7 +190,9 @@ namespace Kemar.HRM.Repository.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("ReleasedAt")
                         .HasColumnType("datetime2");
@@ -369,7 +373,7 @@ namespace Kemar.HRM.Repository.Migrations
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.RoomAllocation", b =>
                 {
-                    b.HasOne("Kemar.HRM.Repository.Entity.User", "AllocatedBy")
+                    b.HasOne("Kemar.HRM.Repository.Entity.User", "AllocatedByUser")
                         .WithMany("AllocationsHandled")
                         .HasForeignKey("AllocatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -387,7 +391,7 @@ namespace Kemar.HRM.Repository.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("AllocatedBy");
+                    b.Navigation("AllocatedByUser");
 
                     b.Navigation("Room");
 

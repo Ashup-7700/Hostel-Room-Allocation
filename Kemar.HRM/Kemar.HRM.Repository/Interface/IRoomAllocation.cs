@@ -7,10 +7,15 @@ namespace Kemar.HRM.Repository.Interface
 {
     public interface IRoomAllocation
     {
+
         Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request, string username);
+
         Task<ResultModel> GetByIdAsync(int id);
+
         Task<ResultModel> GetByFilterAsync(RoomAllocationFilter filter);
+
         Task<ResultModel> DeleteAsync(int id, string username);
+
         Task<RoomAllocation?> GetActiveByStudentIdAsync(int studentId);
     }
 }

@@ -57,31 +57,18 @@ namespace Kemar.HRM.API.Controllers
             var result = await _userManager.DeleteAsync(userId);
             return StatusCode((int)result.StatusCode, result);
         }
-
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> LoginAsync([FromBody] UserLoginRequest request)
         {
             var userResult = await _userManager.AuthenticateAsync(request);
-
-
             if (!userResult.IsSuccess)
                 return StatusCode((int)userResult.StatusCode, userResult);
 
             var user = (dynamic)userResult.Data;
 
-            string token = GenerateJwtToken(user);
-
-            DateTime generatedAt = DateTime.UtcNow;
-            DateTime expiresAt = generatedAt.AddMinutes(40);
-            string? systemIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-
-            await _tokenManager.CreateTokenAsync(
-                user.UserId,
-                token,
-                systemIp,
-                expiresAt
-            );
+            // Generate JWT
+            var token = GenerateJwtToken(user);
 
             var response = new UserLoginResponse
             {
@@ -90,28 +77,28 @@ namespace Kemar.HRM.API.Controllers
                 FullName = user.FullName,
                 Role = user.Role,
                 Token = token,
-                GeneratedAt = generatedAt,
-                ExpiresAt = expiresAt,
-                SystemIp = systemIp
+                GeneratedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddHours(8),
+                SystemIp = HttpContext.Connection.RemoteIpAddress?.ToString()
             };
 
-            return Ok(ResultModel.Success(response, "Login Successful"));
+            // Save token if needed
+            await _tokenManager.CreateTokenAsync(user.UserId, token, response.SystemIp, response.ExpiresAt);
+
+            return Ok(response);
         }
 
         private string GenerateJwtToken(dynamic user)
         {
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"])
-            );
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim("userId", user.UserId.ToString()),
-                new Claim("username", user.Username),
-                new Claim("role", user.Role)
-            };
+        new Claim("UserId", user.UserId.ToString()), // <- This must match what RoomAllocationController reads
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Role, user.Role)
+    };
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
@@ -123,5 +110,6 @@ namespace Kemar.HRM.API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

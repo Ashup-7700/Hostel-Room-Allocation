@@ -2,10 +2,8 @@
 {
     public class RoomAllocationFilter
     {
-        public int? StudentId { get; set; }
-        public int? RoomId { get; set; }
-        public bool? IsActive { get; set; }  // active allocations
-        public DateTime? FromDate { get; set; } // allocation date range
-        public DateTime? ToDate { get; set; }
+        public int? StudentId { get; set; }    // Filter by specific student
+        public int? RoomId { get; set; }       // Filter by specific room
+        public bool? IsActive { get; set; }    // Filter by active/inactive allocations
     }
 }

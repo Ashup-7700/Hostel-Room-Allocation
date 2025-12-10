@@ -1,14 +1,15 @@
-﻿using Kemar.HRM.API.Helpers;
-using Kemar.HRM.Business.RoomAllocationBusiness;
+﻿using Kemar.HRM.Business.RoomAllocationBusiness;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
+using Kemar.HRM.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kemar.HRM.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
     public class RoomAllocationController : ControllerBase
     {
         private readonly IRoomAllocationManager _manager;
@@ -18,32 +19,39 @@ namespace Kemar.HRM.API.Controllers
             _manager = manager;
         }
 
-        [Authorize (Roles = "Hostel Manager,Warden")]
-        [HttpPost("addOrUpdate")]
-        public async Task<IActionResult> AddOrUpdate([FromBody] RoomAllocationRequest request)
-        {
-            var result = await _manager.AddOrUpdateAsync(request);
-            return CommonHelper.ReturnActionResultByStatus(result, this);
-        }
+       [HttpPost("addOrUpdate")]
+public async Task<IActionResult> AddOrUpdateRoomAllocation(RoomAllocationRequest request)
+{
+    if (!ModelState.IsValid)
+        return BadRequest("Invalid data model");
 
-        [Authorize]
-        [HttpGet("getById/{id:int}")]
+    // Automatically get the logged-in user ID from claims
+    var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+    if (userIdClaim == null)
+        return Unauthorized("User not logged in");
+
+    request.AllocatedByUserId = int.Parse(userIdClaim);
+
+    var result = await _manager.AddOrUpdateAsync(request); // Use _manager, not _roomAllocationBusiness
+    return CommonHelper.ReturnActionResultByStatus(result, this);
+}
+
+
+        [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _manager.GetByIdAsync(id);
             return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [Authorize]
-        [HttpPost("getByFilter")]
+        [HttpPost("GetByFilter")]
         public async Task<IActionResult> GetByFilter([FromBody] RoomAllocationFilter filter)
         {
             var result = await _manager.GetByFilterAsync(filter);
             return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [Authorize]
-        [HttpDelete("delete/{id:int}")]
+        [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _manager.DeleteAsync(id);

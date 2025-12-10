@@ -193,7 +193,7 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
-    "Method": "AddOrUpdate",
+    "Method": "AddOrUpdateRoomAllocation",
     "RelativePath": "api/RoomAllocation/addOrUpdate",
     "HttpMethod": "POST",
     "IsController": true,
@@ -210,7 +210,7 @@
   {
     "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
     "Method": "Delete",
-    "RelativePath": "api/RoomAllocation/delete/{id}",
+    "RelativePath": "api/RoomAllocation/Delete/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -226,7 +226,7 @@
   {
     "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
     "Method": "GetByFilter",
-    "RelativePath": "api/RoomAllocation/getByFilter",
+    "RelativePath": "api/RoomAllocation/GetByFilter",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -242,7 +242,7 @@
   {
     "ContainingType": "Kemar.HRM.API.Controllers.RoomAllocationController",
     "Method": "GetById",
-    "RelativePath": "api/RoomAllocation/getById/{id}",
+    "RelativePath": "api/RoomAllocation/GetById/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

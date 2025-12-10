@@ -12,10 +12,12 @@ namespace Kemar.HRM.Repository.Entity
         public int RoomId { get; set; }
         public Room? Room { get; set; }
 
-        public int AllocatedByUserId { get; set; }
-        public User? AllocatedBy { get; set; }
-
-        public DateTime AllocatedAt { get; set; }
+        public DateTime AllocatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ReleasedAt { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public int AllocatedByUserId { get; set; }
+        public User? AllocatedByUser { get; set; }
     }
 }

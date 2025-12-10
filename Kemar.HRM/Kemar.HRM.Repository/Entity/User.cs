@@ -12,6 +12,6 @@ namespace Kemar.HRM.Repository.Entity
         public string Password { get; set; } = string.Empty; // Store hashed
         public bool IsActive { get; set; } = true;
 
-        public virtual ICollection<RoomAllocation>? AllocationsHandled { get; set; }
+        public  ICollection<RoomAllocation>? AllocationsHandled { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace Kemar.HRM.Repository.EntityConfiguration
             builder.Property(x => x.FullName).HasMaxLength(150).IsRequired();
             builder.Property(x => x.Role).HasMaxLength(50).HasDefaultValue("Warden");
 
-            builder.HasMany(u => u.AllocationsHandled).WithOne(ra => ra.AllocatedBy).HasForeignKey(ra => ra.AllocatedByUserId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(u => u.AllocationsHandled).WithOne(ra => ra.AllocatedByUser).HasForeignKey(ra => ra.AllocatedByUserId).OnDelete(DeleteBehavior.Restrict);
 
         }
     }
