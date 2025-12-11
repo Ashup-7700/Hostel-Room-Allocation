@@ -2,7 +2,7 @@
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 
-namespace Kemar.HRM.Business.PaymentBusiness
+namespace Kemar.HRM.Business.Interface
 {
     public interface IPaymentManager
     {
@@ -10,6 +10,5 @@ namespace Kemar.HRM.Business.PaymentBusiness
         Task<ResultModel> GetByIdAsync(int paymentId);
         Task<ResultModel> GetByFilterAsync(PaymentFilter filter);
         Task<ResultModel> DeleteAsync(int paymentId, string deletedBy);
-
     }
 }

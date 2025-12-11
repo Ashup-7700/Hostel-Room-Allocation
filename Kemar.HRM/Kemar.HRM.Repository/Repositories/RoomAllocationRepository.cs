@@ -29,7 +29,6 @@ namespace Kemar.HRM.Repository.Repositories
                 if (request.RoomAllocationId == 0)
                 {
                     entity = _mapper.Map<RoomAllocation>(request);
-                    // Set creator info here if needed
                     await _context.RoomAllocations.AddAsync(entity);
                 }
                 else
@@ -41,11 +40,11 @@ namespace Kemar.HRM.Repository.Repositories
                         return ResultModel.NotFound("Allocation not found");
 
                     _mapper.Map(request, entity);
-                    // Set updater info here if needed
+                   
                 }
 
                 await _context.SaveChangesAsync();
-
+                    
                 return request.RoomAllocationId == 0
                     ? ResultModel.Created(entity, "Created successfully")
                     : ResultModel.Updated(entity, "Updated successfully");

@@ -19,22 +19,21 @@ namespace Kemar.HRM.API.Controllers
             _manager = manager;
         }
 
-       [HttpPost("addOrUpdate")]
-public async Task<IActionResult> AddOrUpdateRoomAllocation(RoomAllocationRequest request)
-{
-    if (!ModelState.IsValid)
-        return BadRequest("Invalid data model");
+        [HttpPost("addOrUpdate")]
+        public async Task<IActionResult> AddOrUpdateRoomAllocation(RoomAllocationRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data.");
 
-    // Automatically get the logged-in user ID from claims
-    var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
-    if (userIdClaim == null)
-        return Unauthorized("User not logged in");
+            //var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            //if (userIdClaim == null)
+            //    return Unauthorized("User not logged in");
 
-    request.AllocatedByUserId = int.Parse(userIdClaim);
+            //request.AllocatedByUserId = int.Parse(userIdClaim);
 
-    var result = await _manager.AddOrUpdateAsync(request); // Use _manager, not _roomAllocationBusiness
-    return CommonHelper.ReturnActionResultByStatus(result, this);
-}
+            var result = await _manager.AddOrUpdateAsync(request);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
+        }
 
 
         [HttpGet("GetById/{id}")]

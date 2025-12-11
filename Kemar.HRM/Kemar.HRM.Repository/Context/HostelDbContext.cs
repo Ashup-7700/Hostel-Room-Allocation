@@ -31,6 +31,8 @@ namespace Kemar.HRM.Repository.Context
 
             modelBuilder.Entity<Student>().HasQueryFilter(s => s.IsActive);
             modelBuilder.Entity<User>().HasQueryFilter(u => u.IsActive);
+            modelBuilder.Entity<RoomAllocation>().HasOne(r => r.AllocatedByUser).WithMany().HasForeignKey(r => r.AllocatedByUserId).OnDelete(DeleteBehavior.Restrict);
+
 
             modelBuilder.ApplyConfiguration(new StudentConfig());
             modelBuilder.ApplyConfiguration(new RoomConfig());

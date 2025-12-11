@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kemar.HRM.Repository.Migrations
 {
     [DbContext(typeof(HostelDbContext))]
-    [Migration("20251210101239_Init")]
-    partial class Init
+    [Migration("20251211125850_Initional")]
+    partial class Initional
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,23 +84,31 @@ namespace Kemar.HRM.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("PaymentMethod")
+                    b.Property<string>("PaymentMode")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("PaymentType")
+                    b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StudentId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -113,6 +121,8 @@ namespace Kemar.HRM.Repository.Migrations
                     b.HasKey("PaymentId");
 
                     b.HasIndex("StudentId");
+
+                    b.HasIndex("StudentId1");
 
                     b.ToTable("Payments");
                 });
@@ -362,13 +372,15 @@ namespace Kemar.HRM.Repository.Migrations
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.Payment", b =>
                 {
-                    b.HasOne("Kemar.HRM.Repository.Entity.Student", "Student")
-                        .WithMany("Payments")
+                    b.HasOne("Kemar.HRM.Repository.Entity.Student", null)
+                        .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Student");
+                    b.HasOne("Kemar.HRM.Repository.Entity.Student", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("StudentId1");
                 });
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.RoomAllocation", b =>

@@ -1,45 +1,65 @@
-﻿using Kemar.HRM.Business.PaymentBusiness;
+﻿using Kemar.HRM.API.Helpers;
+using Kemar.HRM.Business.Interface;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kemar.HRM.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PaymentController : ControllerBase
     {
-        private readonly IPaymentManager _manager;
+        private readonly IPaymentManager _paymentManager;
 
-        public PaymentController(IPaymentManager manager)
+        public PaymentController(IPaymentManager paymentManager)
         {
-            _manager = manager;
+            _paymentManager = paymentManager;
         }
 
         [HttpPost("addOrUpdate")]
         public async Task<IActionResult> AddOrUpdateAsync([FromBody] PaymentRequest request)
         {
-            return Ok(await _manager.AddOrUpdateAsync(request));
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            CommonHelper.SetUserInformation(request, request.PaymentId, HttpContext);
+
+            var result = await _paymentManager.AddOrUpdateAsync(request);
+
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [HttpGet("{paymentId}")]
+        [HttpGet("GetById/{paymentId}")]
         public async Task<IActionResult> GetByIdAsync(int paymentId)
         {
-            return Ok(await _manager.GetByIdAsync(paymentId));
+            var result = await _paymentManager.GetByIdAsync(paymentId);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [HttpPost("filter")]
+        [HttpPost("getByFilter")]
         public async Task<IActionResult> GetByFilterAsync([FromBody] PaymentFilter filter)
         {
-            return Ok(await _manager.GetByFilterAsync(filter));
+            if (filter == null)
+                return BadRequest("Filter cannot be null");
+
+            var result = await _paymentManager.GetByFilterAsync(filter);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-        [HttpDelete("{paymentId}")]
+        [HttpDelete("delete/{paymentId:int}")]
         public async Task<IActionResult> DeleteAsync(int paymentId)
         {
-            string deletedBy = "admin";
-            return Ok(await _manager.DeleteAsync(paymentId, deletedBy));
+            var username = HttpContext.User.Claims
+                .FirstOrDefault(c => c.Type == "username")?.Value ?? "System";
 
+            var result = await _paymentManager.DeleteAsync(paymentId, username);
+            return CommonHelper.ReturnActionResultByStatus(result, this);
         }
     }
+
 }
+
+

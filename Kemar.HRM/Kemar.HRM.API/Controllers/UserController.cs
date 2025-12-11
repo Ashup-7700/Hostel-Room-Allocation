@@ -78,7 +78,7 @@ namespace Kemar.HRM.API.Controllers
                 Role = user.Role,
                 Token = token,
                 GeneratedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddHours(8),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(45),
                 SystemIp = HttpContext.Connection.RemoteIpAddress?.ToString()
             };
 

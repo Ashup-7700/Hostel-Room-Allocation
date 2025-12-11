@@ -65,38 +65,6 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
-    "Method": "GetByIdAsync",
-    "RelativePath": "api/Payment/{paymentId}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "paymentId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
-    "Method": "DeleteAsync",
-    "RelativePath": "api/Payment/{paymentId}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "paymentId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
     "Method": "AddOrUpdateAsync",
     "RelativePath": "api/Payment/addOrUpdate",
     "HttpMethod": "POST",
@@ -113,8 +81,24 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
+    "Method": "DeleteAsync",
+    "RelativePath": "api/Payment/delete/{paymentId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "paymentId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
     "Method": "GetByFilterAsync",
-    "RelativePath": "api/Payment/filter",
+    "RelativePath": "api/Payment/getByFilter",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -122,6 +106,22 @@
       {
         "Name": "filter",
         "Type": "Kemar.HRM.Model.Filter.PaymentFilter",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
+    "Method": "GetByIdAsync",
+    "RelativePath": "api/Payment/GetById/{paymentId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "paymentId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],

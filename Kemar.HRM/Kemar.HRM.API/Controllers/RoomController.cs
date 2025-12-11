@@ -20,7 +20,7 @@ namespace Kemar.HRM.API.Controllers
         [HttpPost("addOrUpdate")]
         public async Task<IActionResult> AddOrUpdate([FromBody] RoomRequest request)
         {
-            CommonHelper.SetUserInformation(ref request, request.RoomId ?? 0, HttpContext);
+            CommonHelper.SetUserInformation( request, request.RoomId ?? 0, HttpContext);
 
             var result = await _manager.AddOrUpdateAsync(request);
             return CommonHelper.ReturnActionResultByStatus(result,this);

@@ -1,4 +1,5 @@
-﻿using Kemar.HRM.Model.Common;
+﻿using Kemar.HRM.Business.UserBusiness;
+using Kemar.HRM.Model.Common;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Response;
@@ -11,15 +12,19 @@ namespace Kemar.HRM.Business.RoomAllocationBusiness
     {
         private readonly IRoomAllocation _repository;
         private readonly IRoom _roomRepository;
+        private readonly IUserManager _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public RoomAllocationManager(
             IRoomAllocation repository,
             IRoom roomRepository,
+            IUserManager userRepository,
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _roomRepository = roomRepository;
+            _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -48,10 +53,14 @@ namespace Kemar.HRM.Business.RoomAllocationBusiness
                 Floor = room.Floor
             };
         }
-
+        private async Task<bool> CheckUserExistsAsync(int userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            return user?.Data != null;
+        }
         public async Task<ResultModel> AddOrUpdateAsync(RoomAllocationRequest request)
         {
-           request.AllocatedByUserId = GetCurrentUserId();
+           //request.AllocatedByUserId = GetCurrentUserId();
 
             string username = GetCurrentUsername();
 
@@ -65,7 +74,7 @@ namespace Kemar.HRM.Business.RoomAllocationBusiness
                     return ResultModel.Failure(ResultCode.NotAllowed, "Room is already full.");
 
                 room.CurrentOccupancy += 1;
-                room.Capacity -= 1;
+                //room.Capacity -= 1;
 
                 var roomRequest = MapRoomEntityToRequestForOccupancy(room);
                 await _roomRepository.AddOrUpdateAsync(roomRequest);

@@ -11,9 +11,13 @@ namespace Kemar.HRM.Repository.Entity
 
         public decimal Amount { get; set; }
 
-        public string PaymentMethod { get; set; } = string.Empty;
-        public string PaymentType { get; set; } = string.Empty;
+        public string PaymentMode { get; set; } = string.Empty;
 
-        public DateTime PaymentDate { get; set; }
+        public string PaymentStatus { get; set; } = string.Empty;
+
+        public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
+
+        public int CreatedByUserId { get; set; }
+
     }
 }

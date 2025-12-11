@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kemar.HRM.Repository.Repositories
 {
-    public class PaymentRepository : IPayment
+    public class PaymentRepository : IPaymentRepository
     {
         private readonly HostelDbContext _context;
         private readonly IMapper _mapper;
@@ -21,99 +21,121 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
+        // ----------------------------------------------------
+        // Add or Update Payment
+        // ----------------------------------------------------
         public async Task<ResultModel> AddOrUpdateAsync(PaymentRequest request)
         {
             try
             {
-                if (request.PaymentId.HasValue && request.PaymentId.Value > 0)
+                Payment entity;
+
+                if (request.PaymentId > 0)
                 {
-                    var existing = await _context.Payments
-                        .FirstOrDefaultAsync(p => p.PaymentId == request.PaymentId.Value);
+                    // UPDATE
+                    entity = await _context.Payments
+                        .FirstOrDefaultAsync(p => p.PaymentId == request.PaymentId);
 
-                    if (existing == null)
-                        return ResultModel.NotFound("Payment not found");
+                    if (entity == null)
+                        return ResultModel.NotFound("Payment record not found.");
 
-                    _mapper.Map(request, existing);
-
-                    existing.UpdatedAt = DateTime.UtcNow;
-                    existing.UpdatedBy = request.UpdatedBy;
+                    _mapper.Map(request, entity);
+                    entity.UpdatedAt = DateTime.UtcNow;
 
                     await _context.SaveChangesAsync();
-
-                    return ResultModel.Updated(null, "Payment updated successfully");
+                    return ResultModel.Updated(_mapper.Map<PaymentResponse>(entity), "Payment updated successfully");
                 }
                 else
                 {
-                    var entity = _mapper.Map<Payment>(request);
-
+                    // CREATE
+                    entity = _mapper.Map<Payment>(request);
                     entity.CreatedAt = DateTime.UtcNow;
-                    entity.IsActive = request.IsActive ?? true;
-                    entity.CreatedBy = request.CreatedBy;
 
-                    _context.Payments.Add(entity);
+                    await _context.Payments.AddAsync(entity);
                     await _context.SaveChangesAsync();
 
-                    return ResultModel.Created(null, "Payment created successfully");
+                    return ResultModel.Created(_mapper.Map<PaymentResponse>(entity), "Payment created successfully");
                 }
             }
             catch (Exception ex)
             {
-                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.Message);
+                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
             }
         }
 
+        // ----------------------------------------------------
+        // Get Payment by ID
+        // ----------------------------------------------------
         public async Task<ResultModel> GetByIdAsync(int paymentId)
         {
-            var entity = await _context.Payments.AsNoTracking()
-                .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
+            try
+            {
+                var entity = await _context.Payments
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
 
-            if (entity == null)
-                return ResultModel.NotFound("Payment not found");
+                if (entity == null)
+                    return ResultModel.NotFound("Payment not found.");
 
-            var dto = _mapper.Map<PaymentResponse>(entity);
-            return ResultModel.Success(dto);
+                return ResultModel.Success(_mapper.Map<PaymentResponse>(entity));
+            }
+            catch (Exception ex)
+            {
+                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
+            }
         }
 
+        // ----------------------------------------------------
+        // Get Payments by Filter
+        // ----------------------------------------------------
         public async Task<ResultModel> GetByFilterAsync(PaymentFilter filter)
         {
-            var query = _context.Payments.AsNoTracking().AsQueryable();
+            try
+            {
+                var query = _context.Payments.AsQueryable();
 
-            if (filter.StudentId.HasValue)
-                query = query.Where(p => p.StudentId == filter.StudentId);
+                if (filter.StudentId.HasValue && filter.StudentId.Value > 0)
+                    query = query.Where(p => p.StudentId == filter.StudentId.Value);
 
-            if (!string.IsNullOrWhiteSpace(filter.PaymentMethod))
-                query = query.Where(p => p.PaymentMethod.Contains(filter.PaymentMethod));
+                if (!string.IsNullOrEmpty(filter.PaymentStatus))
+                    query = query.Where(p => p.PaymentStatus == filter.PaymentStatus);
 
-            if (!string.IsNullOrWhiteSpace(filter.PaymentType))
-                query = query.Where(p => p.PaymentType.Contains(filter.PaymentType));
+                var list = await query.AsNoTracking().ToListAsync();
+                var mappedList = _mapper.Map<List<PaymentResponse>>(list);
 
-            if (filter.FromDate.HasValue)
-                query = query.Where(p => p.PaymentDate >= filter.FromDate);
-
-            if (filter.ToDate.HasValue)
-                query = query.Where(p => p.PaymentDate <= filter.ToDate);
-
-            var items = await query.OrderByDescending(p => p.PaymentDate).ToListAsync();
-
-            return ResultModel.Success(_mapper.Map<List<PaymentResponse>>(items));
+                return ResultModel.Success(mappedList);
+            }
+            catch (Exception ex)
+            {
+                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
+            }
         }
 
+        // ----------------------------------------------------
+        // Delete Payment (Soft Delete)
+        // ----------------------------------------------------
         public async Task<ResultModel> DeleteAsync(int paymentId, string deletedBy)
         {
-            var existing = await _context.Payments
-                .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
+            try
+            {
+                var entity = await _context.Payments
+                    .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
 
-            if (existing == null)
-                return ResultModel.NotFound("Payment not found");
+                if (entity == null)
+                    return ResultModel.NotFound("Payment not found.");
 
-            existing.IsActive = false;
-            existing.UpdatedAt = DateTime.UtcNow;
-            existing.UpdatedBy = deletedBy;
+                entity.IsActive = false;
+                entity.UpdatedBy = deletedBy;
+                entity.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
-            return ResultModel.Success(null, "Payment deleted successfully");
-
+                return ResultModel.Success(message: "Payment deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
+            }
         }
     }
 }

@@ -142,29 +142,8 @@
         }
       }
     },
-    "/api/Payment/{paymentId}": {
+    "/api/Payment/GetById/{paymentId}": {
       "get": {
-        "tags": [
-          "Payment"
-        ],
-        "parameters": [
-          {
-            "name": "paymentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
         "tags": [
           "Payment"
         ],
@@ -186,7 +165,7 @@
         }
       }
     },
-    "/api/Payment/filter": {
+    "/api/Payment/getByFilter": {
       "post": {
         "tags": [
           "Payment"
@@ -210,6 +189,29 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Payment/delete/{paymentId}": {
+      "delete": {
+        "tags": [
+          "Payment"
+        ],
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -724,22 +726,8 @@
             "format": "int32",
             "nullable": true
           },
-          "paymentMethod": {
+          "paymentStatus": {
             "type": "string",
-            "nullable": true
-          },
-          "paymentType": {
-            "type": "string",
-            "nullable": true
-          },
-          "fromDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "toDate": {
-            "type": "string",
-            "format": "date-time",
             "nullable": true
           }
         },
@@ -750,8 +738,7 @@
         "properties": {
           "paymentId": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           },
           "studentId": {
             "type": "integer",
@@ -761,11 +748,7 @@
             "type": "number",
             "format": "double"
           },
-          "paymentMethod": {
-            "type": "string",
-            "nullable": true
-          },
-          "paymentType": {
+          "paymentMode": {
             "type": "string",
             "nullable": true
           },
@@ -773,17 +756,13 @@
             "type": "string",
             "format": "date-time"
           },
-          "createdBy": {
+          "paymentStatus": {
             "type": "string",
             "nullable": true
           },
-          "updatedBy": {
-            "type": "string",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean",
-            "nullable": true
+          "createdByUserId": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -823,14 +802,21 @@
             "type": "integer",
             "format": "int32"
           },
+          "allocatedByUserId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "allocatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "releasedAt": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "allocatedByUserId": {
-            "type": "integer",
-            "format": "int32"
+          "isActive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -1,6 +1,7 @@
 ﻿using Kemar.HRM.API.AutoMapper;
+using Kemar.HRM.Business;
 using Kemar.HRM.Business.FeeStructureBusiness;
-using Kemar.HRM.Business.PaymentBusiness;
+using Kemar.HRM.Business.Interface;
 using Kemar.HRM.Business.RoomAllocationBusiness;
 using Kemar.HRM.Business.RoomBusiness;
 using Kemar.HRM.Business.StudentBusiness;
@@ -40,8 +41,9 @@ builder.Services.AddScoped<IUserTokenManager, UserTokenManager>();
 builder.Services.AddScoped<IRoomAllocation, RoomAllocationRepository>();
 builder.Services.AddScoped<IRoomAllocationManager, RoomAllocationManager>();
 
-builder.Services.AddScoped<IPayment, PaymentRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentManager, PaymentManager>();
+
 
 builder.Services.AddScoped<IFeeStructure, FeeStructureRepository>();
 builder.Services.AddScoped<IFeeStructureManager, FeeStructureManager>();

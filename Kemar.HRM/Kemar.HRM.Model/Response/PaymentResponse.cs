@@ -5,17 +5,23 @@
         public int PaymentId { get; set; }
 
         public int StudentId { get; set; }
+
         public decimal Amount { get; set; }
-        public string PaymentMethod { get; set; } = string.Empty;
-        public string PaymentType { get; set; } = string.Empty;
+
+        public string PaymentMode { get; set; } = string.Empty;
+
         public DateTime PaymentDate { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public string? CreatedBy { get; set; }
-        public string? UpdatedBy { get; set; }
+        public string PaymentStatus { get; set; } = string.Empty;
 
-        public bool IsActive { get; set; }
+        public int CreatedByUserId { get; set; }
 
+        public string? CreatedBy { get; set; }   
+        public string? UpdatedBy { get; set; }   
+
+        public DateTime CreatedAt { get; set; }  
+        public DateTime UpdatedAt { get; set; }  
+
+        public bool IsActive { get; set; }       
     }
 }
