@@ -31,8 +31,12 @@ namespace Kemar.HRM.Repository.Context
 
             modelBuilder.Entity<Student>().HasQueryFilter(s => s.IsActive);
             modelBuilder.Entity<User>().HasQueryFilter(u => u.IsActive);
-            modelBuilder.Entity<RoomAllocation>().HasOne(r => r.AllocatedByUser).WithMany().HasForeignKey(r => r.AllocatedByUserId).OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<RoomAllocation>()
+                .HasOne(r => r.AllocatedByUser)
+                .WithMany()
+                .HasForeignKey(r => r.AllocatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.ApplyConfiguration(new StudentConfig());
             modelBuilder.ApplyConfiguration(new RoomConfig());
@@ -58,6 +62,7 @@ namespace Kemar.HRM.Repository.Context
         private void AddAuditInfo()
         {
             string currentUserRole = "Unknown";
+            int? currentUserId = null;
 
             try
             {
@@ -65,6 +70,12 @@ namespace Kemar.HRM.Repository.Context
 
                 if (userClaims != null && userClaims.Identity.IsAuthenticated)
                 {
+                    var userIdClaim = userClaims.Claims
+                        .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                    if (int.TryParse(userIdClaim, out int uid))
+                        currentUserId = uid;
+
                     currentUserRole = userClaims.Claims
                         .FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "Unknown";
                 }
@@ -72,47 +83,41 @@ namespace Kemar.HRM.Repository.Context
             catch
             {
                 currentUserRole = "Unknown";
+                currentUserId = null;
             }
 
             foreach (var entry in ChangeTracker.Entries<BaseEntity>())
             {
                 bool isUserEntity = entry.Entity is User;
 
-
-                if (entry.State == EntityState.Added && isUserEntity)
+                if (entry.State == EntityState.Added)
                 {
                     entry.Entity.CreatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedAt = null;
                     entry.Entity.IsActive = true;
+                    entry.Entity.CreatedBy = isUserEntity ? "Admin" : currentUserRole;
 
-                    entry.Entity.CreatedBy = "Admin";
+                    if (!isUserEntity)
+                    {
+                        var prop = entry.Entity.GetType().GetProperty("CreatedByUserId");
+                        if (prop != null)
+                            prop.SetValue(entry.Entity, currentUserId);
+                    }
+
+                    entry.Entity.UpdatedAt = null;
                     entry.Entity.UpdatedBy = null;
                     continue;
                 }
 
-                if (entry.State == EntityState.Modified && isUserEntity)
+                if (entry.State == EntityState.Modified)
                 {
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedBy = "Admin";
-                    continue;
-                }
+                    entry.Entity.UpdatedBy = isUserEntity ? "Admin" : currentUserRole;
 
-                if (entry.State == EntityState.Added && !isUserEntity)
-                {
-                    entry.Entity.CreatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedAt = null;
-                    entry.Entity.IsActive = true;
-
-                    entry.Entity.CreatedBy = currentUserRole;
-                    entry.Entity.UpdatedBy = null;
-                    continue;
-                }
-
-
-                if (entry.State == EntityState.Modified && !isUserEntity)
-                {
-                    entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedBy = currentUserRole;
+                    
+                    if (currentUserId == null)
+                    {
+                        throw new UnauthorizedAccessException("User must be logged in to update records.");
+                    }
                     continue;
                 }
 
@@ -120,11 +125,12 @@ namespace Kemar.HRM.Repository.Context
                 {
                     entry.State = EntityState.Modified;
                     entry.Entity.IsActive = false;
-
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedBy = currentUserRole;
+                    entry.Entity.UpdatedBy = isUserEntity ? "Admin" : currentUserRole;
                 }
             }
         }
+
+
     }
 }

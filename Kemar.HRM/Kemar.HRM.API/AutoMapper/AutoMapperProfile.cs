@@ -70,10 +70,13 @@ namespace Kemar.HRM.API.AutoMapper
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
-                .ForMember(dest => dest.StudentId, opt => opt.Ignore());
+
+                .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.StudentId))
+                .ForMember(dest => dest.Student, opt => opt.Ignore()); 
 
             CreateMap<Payment, PaymentResponse>();
             #endregion
+
 
             #region FeeStructure
             CreateMap<FeeStructureRequest, FeeStructure>()

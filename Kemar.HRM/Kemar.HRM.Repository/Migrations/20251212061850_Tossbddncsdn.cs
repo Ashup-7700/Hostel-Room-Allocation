@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Kemar.HRM.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class Initional : Migration
+    public partial class Tossbddncsdn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -109,7 +109,6 @@ namespace Kemar.HRM.Repository.Migrations
                     PaymentStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     CreatedByUserId = table.Column<int>(type: "int", nullable: false),
-                    StudentId1 = table.Column<int>(type: "int", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -125,11 +124,6 @@ namespace Kemar.HRM.Repository.Migrations
                         principalTable: "Students",
                         principalColumn: "StudentId",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Payments_Students_StudentId1",
-                        column: x => x.StudentId1,
-                        principalTable: "Students",
-                        principalColumn: "StudentId");
                 });
 
             migrationBuilder.CreateTable(
@@ -178,11 +172,11 @@ namespace Kemar.HRM.Repository.Migrations
                 {
                     UserTokenId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Token = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     GeneratedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SystemIp = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    SystemIp = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -199,11 +193,6 @@ namespace Kemar.HRM.Repository.Migrations
                 name: "IX_Payments_StudentId",
                 table: "Payments",
                 column: "StudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Payments_StudentId1",
-                table: "Payments",
-                column: "StudentId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoomAllocations_AllocatedByUserId",

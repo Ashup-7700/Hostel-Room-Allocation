@@ -8,8 +8,8 @@ namespace Kemar.HRM.Repository.Entity
 
         public string FullName { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
-        public string Role { get; set; } = "Admin";  // Admin, HostelManager, Accountant
-        public string Password { get; set; } = string.Empty; // Store hashed
+        public string Role { get; set; } = "Admin";  
+        public string Password { get; set; } = string.Empty; 
         public bool IsActive { get; set; } = true;
 
         public  ICollection<RoomAllocation>? AllocationsHandled { get; set; }

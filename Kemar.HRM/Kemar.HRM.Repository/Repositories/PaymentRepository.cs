@@ -21,9 +21,6 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
-        // ----------------------------------------------------
-        // Add or Update Payment
-        // ----------------------------------------------------
         public async Task<ResultModel> AddOrUpdateAsync(PaymentRequest request)
         {
             try
@@ -32,7 +29,6 @@ namespace Kemar.HRM.Repository.Repositories
 
                 if (request.PaymentId > 0)
                 {
-                    // UPDATE
                     entity = await _context.Payments
                         .FirstOrDefaultAsync(p => p.PaymentId == request.PaymentId);
 
@@ -47,7 +43,13 @@ namespace Kemar.HRM.Repository.Repositories
                 }
                 else
                 {
-                    // CREATE
+                    // Check if Student exists and is active
+                    var studentExists = await _context.Students
+                        .AnyAsync(s => s.StudentId == request.StudentId && s.IsActive);
+
+                    if (!studentExists)
+                        return ResultModel.Failure(ResultCode.Invalid, "Student does not exist or is inactive.");
+
                     entity = _mapper.Map<Payment>(request);
                     entity.CreatedAt = DateTime.UtcNow;
 
@@ -63,14 +65,12 @@ namespace Kemar.HRM.Repository.Repositories
             }
         }
 
-        // ----------------------------------------------------
-        // Get Payment by ID
-        // ----------------------------------------------------
         public async Task<ResultModel> GetByIdAsync(int paymentId)
         {
             try
             {
                 var entity = await _context.Payments
+                    .Include(p => p.Student)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
 
@@ -85,14 +85,11 @@ namespace Kemar.HRM.Repository.Repositories
             }
         }
 
-        // ----------------------------------------------------
-        // Get Payments by Filter
-        // ----------------------------------------------------
         public async Task<ResultModel> GetByFilterAsync(PaymentFilter filter)
         {
             try
             {
-                var query = _context.Payments.AsQueryable();
+                var query = _context.Payments.Include(p => p.Student).AsQueryable();
 
                 if (filter.StudentId.HasValue && filter.StudentId.Value > 0)
                     query = query.Where(p => p.StudentId == filter.StudentId.Value);
@@ -111,9 +108,6 @@ namespace Kemar.HRM.Repository.Repositories
             }
         }
 
-        // ----------------------------------------------------
-        // Delete Payment (Soft Delete)
-        // ----------------------------------------------------
         public async Task<ResultModel> DeleteAsync(int paymentId, string deletedBy)
         {
             try

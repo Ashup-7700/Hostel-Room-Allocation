@@ -43,11 +43,12 @@ namespace Kemar.HRM.Repository.EntityConfiguration
                    .HasForeignKey(ra => ra.StudentId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-     
-            //builder.HasMany<Payment>()
-            //       .WithOne() 
-            //       .HasForeignKey(p => p.StudentId)
-            //       .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(s => s.Payments)
+                 .WithOne(p => p.Student)
+                 .HasForeignKey(p => p.StudentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

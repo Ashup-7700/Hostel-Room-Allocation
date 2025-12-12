@@ -65,7 +65,7 @@
   },
   {
     "ContainingType": "Kemar.HRM.API.Controllers.PaymentController",
-    "Method": "AddOrUpdateAsync",
+    "Method": "AddOrUpdate",
     "RelativePath": "api/Payment/addOrUpdate",
     "HttpMethod": "POST",
     "IsController": true,

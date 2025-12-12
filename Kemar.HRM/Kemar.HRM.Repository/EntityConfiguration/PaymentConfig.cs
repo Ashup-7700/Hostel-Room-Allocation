@@ -12,9 +12,8 @@ namespace Kemar.HRM.Repository.EntityConfiguration
             base.Configure(builder);
 
             builder.HasKey(p => p.PaymentId);
+            builder.Property(p => p.PaymentId).ValueGeneratedOnAdd();
 
-            builder.Property(p => p.PaymentId)
-                   .ValueGeneratedOnAdd();
 
             builder.Property(p => p.Amount)
                    .IsRequired()
@@ -32,8 +31,9 @@ namespace Kemar.HRM.Repository.EntityConfiguration
                    .IsRequired()
                    .HasDefaultValueSql("GETUTCDATE()");
 
-            builder.HasOne<Student>()
-                   .WithMany()
+            // FINAL FIX → correct relationship
+            builder.HasOne(p => p.Student)
+                   .WithMany(s => s.Payments)
                    .HasForeignKey(p => p.StudentId)
                    .OnDelete(DeleteBehavior.Restrict);
         }

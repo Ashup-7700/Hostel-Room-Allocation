@@ -55,6 +55,7 @@ namespace Kemar.HRM.Business.UserBusiness
                 FullName = user.FullName,
                 Role = user.Role,
                 GeneratedAt = generatedAt,
+                UserId = user.UserId,
                 ExpiresAt = expiresAt,
                 SystemIp = GetClientIp()
             };

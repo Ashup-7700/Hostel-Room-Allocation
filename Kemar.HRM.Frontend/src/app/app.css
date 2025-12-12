@@ -1,0 +1,68 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body scroll smooth */
+body {
+  scroll-behavior: smooth;
+  font-family: Arial, sans-serif;
+}
+
+/* Main Layout */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Top Navbar */
+.top-navbar {
+  width: 100%;
+  background-color: #1e3a8a;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  position: fixed; /* FIXED AT TOP */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* Logo */
+.top-navbar .logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Navigation Links */
+.top-navbar .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+.top-navbar .nav-links li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.top-navbar .nav-links li a:hover {
+  background-color: #3b82f6;
+}
+
+/* Page Content */
+.content {
+  margin-top: 70px; /* Leave space for fixed navbar */
+  padding: 20px;
+  background: #f4f4f4;
+  min-height: calc(100vh - 70px);
+}

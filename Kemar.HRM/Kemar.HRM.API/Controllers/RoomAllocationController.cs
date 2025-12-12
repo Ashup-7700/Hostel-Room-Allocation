@@ -4,12 +4,13 @@ using Kemar.HRM.Model.Request;
 using Kemar.HRM.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Kemar.HRM.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize] // just need the user to be logged in
     public class RoomAllocationController : ControllerBase
     {
         private readonly IRoomAllocationManager _manager;
@@ -25,16 +26,16 @@ namespace Kemar.HRM.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data.");
 
-            //var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
-            //if (userIdClaim == null)
-            //    return Unauthorized("User not logged in");
-
-            //request.AllocatedByUserId = int.Parse(userIdClaim);
+  
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdClaim, out int currentUserId))
+            {
+                request.AllocatedByUserId = currentUserId;
+            }
 
             var result = await _manager.AddOrUpdateAsync(request);
             return CommonHelper.ReturnActionResultByStatus(result, this);
         }
-
 
         [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetById(int id)

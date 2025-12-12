@@ -17,7 +17,7 @@ namespace Kemar.HRM.Repository.Entity
 
         public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
 
-        public int CreatedByUserId { get; set; }
+        public int? CreatedByUserId { get; set; }
 
     }
 }

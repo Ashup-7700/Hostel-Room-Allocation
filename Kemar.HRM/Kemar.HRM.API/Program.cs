@@ -19,38 +19,58 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ----------------------------------------
+// Add Services
+// ----------------------------------------
+
 builder.Services.AddHttpContextAccessor();
 
+// DbContext
 builder.Services.AddDbContext<HostelDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Controllers + JSON
+builder.Services.AddControllers().AddJsonOptions(opt =>
+{
+    opt.JsonSerializerOptions.ReferenceHandler =
+        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
+
+// AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
+// Dependency Injection
 builder.Services.AddScoped<IStudent, StudentRepository>();
 builder.Services.AddScoped<IStudentManager, StudentManager>();
-
 builder.Services.AddScoped<IRoom, RoomRepository>();
 builder.Services.AddScoped<IRoomManager, RoomManager>();
-
 builder.Services.AddScoped<IUser, UserRepository>();
 builder.Services.AddScoped<IUserManager, UserManager>();
-
 builder.Services.AddScoped<IUserToken, UserTokenRepository>();
 builder.Services.AddScoped<IUserTokenManager, UserTokenManager>();
-
 builder.Services.AddScoped<IRoomAllocation, RoomAllocationRepository>();
 builder.Services.AddScoped<IRoomAllocationManager, RoomAllocationManager>();
-
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentManager, PaymentManager>();
-
-
 builder.Services.AddScoped<IFeeStructure, FeeStructureRepository>();
 builder.Services.AddScoped<IFeeStructureManager, FeeStructureManager>();
 
+// ----------------------------------------
+// CORS (Fix for Angular 4200)
+// ----------------------------------------
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
-builder.Services.AddControllers();
-
+// ----------------------------------------
+// JWT Authentication
+// ----------------------------------------
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
@@ -75,12 +95,12 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-
-        NameClaimType = "UserId",
+        NameClaimType = ClaimTypes.NameIdentifier,
         RoleClaimType = ClaimTypes.Role
     };
 });
 
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -103,6 +123,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// ----------------------------------------
+// Build App
+// ----------------------------------------
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -111,8 +134,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// CORS MUST COME BEFORE Auth
+app.UseCors("AllowAngular");
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

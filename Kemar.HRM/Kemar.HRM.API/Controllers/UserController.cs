@@ -1,6 +1,5 @@
 ﻿using Kemar.HRM.Business.UserBusiness;
 using Kemar.HRM.Business.UserTokenBusiness;
-using Kemar.HRM.Model.Common;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -95,7 +94,7 @@ namespace Kemar.HRM.API.Controllers
 
             var claims = new[]
             {
-        new Claim("UserId", user.UserId.ToString()), // <- This must match what RoomAllocationController reads
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), 
         new Claim(ClaimTypes.Name, user.Username),
         new Claim(ClaimTypes.Role, user.Role)
     };

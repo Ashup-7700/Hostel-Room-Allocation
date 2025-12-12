@@ -105,9 +105,6 @@ namespace Kemar.HRM.Repository.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StudentId1")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -118,8 +115,6 @@ namespace Kemar.HRM.Repository.Migrations
                     b.HasKey("PaymentId");
 
                     b.HasIndex("StudentId");
-
-                    b.HasIndex("StudentId1");
 
                     b.ToTable("Payments");
                 });
@@ -369,15 +364,13 @@ namespace Kemar.HRM.Repository.Migrations
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.Payment", b =>
                 {
-                    b.HasOne("Kemar.HRM.Repository.Entity.Student", null)
-                        .WithMany()
+                    b.HasOne("Kemar.HRM.Repository.Entity.Student", "Student")
+                        .WithMany("Payments")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Kemar.HRM.Repository.Entity.Student", null)
-                        .WithMany("Payments")
-                        .HasForeignKey("StudentId1");
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Kemar.HRM.Repository.Entity.RoomAllocation", b =>
