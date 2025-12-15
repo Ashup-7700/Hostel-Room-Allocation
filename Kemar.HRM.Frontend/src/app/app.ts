@@ -1,10 +1,20 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet,RouterLink],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
-export class App { }
+export class App {
+
+  constructor(private router: Router) {}
+
+  logout(): void {
+    localStorage.clear();
+    this.router.navigate(['/login']);
+  }
+}

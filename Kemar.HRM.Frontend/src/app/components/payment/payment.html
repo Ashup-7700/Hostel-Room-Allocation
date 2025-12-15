@@ -1,1 +1,31 @@
-<p>payment works!</p>
+<div class="student-container">
+
+  <h2>Payments</h2>
+
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <input formControlName="studentId" placeholder="Student ID">
+    <input formControlName="amount" placeholder="Amount">
+    <input formControlName="paymentMode" placeholder="Mode (Cash / UPI)">
+    <button type="submit">Save</button>
+  </form>
+
+  <table>
+    <tr>
+      <th>Student</th>
+      <th>Amount</th>
+      <th>Mode</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+    <tr *ngFor="let p of list">
+      <td>{{ p.studentId }}</td>
+      <td>{{ p.amount }}</td>
+      <td>{{ p.paymentMode }}</td>
+      <td>{{ p.paymentStatus }}</td>
+      <td>
+        <button (click)="delete(p.paymentId)">Delete</button>
+      </td>
+    </tr>
+  </table>
+
+</div>

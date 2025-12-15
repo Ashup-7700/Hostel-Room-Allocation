@@ -9,11 +9,9 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent {
 
-  username = localStorage.getItem('username') ?? 'User';
-
   constructor(private router: Router) {}
 
-  logout() {
+  logout(): void {
     localStorage.clear();
     this.router.navigate(['/login']);
   }

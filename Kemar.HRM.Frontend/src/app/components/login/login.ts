@@ -1,8 +1,13 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -10,70 +15,81 @@ import { CommonModule } from '@angular/common';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule,
     HttpClientModule
   ],
   templateUrl: './login.html',
-  styleUrls: ['./login.css'],
+  styleUrls: ['./login.css']
 })
 export class LoginComponent {
 
-  loginForm: FormGroup;
-  registerForm: FormGroup;
+  /* ---------------- API ---------------- */
+  private apiUrl = 'http://localhost:5027/api/User';
+
+  /* ---------------- UI State ---------------- */
   isLoginMode = true;
   loading = false;
   message = '';
-  apiUrl = 'http://localhost:5027/api/User';
+
+  /* ---------------- Forms ---------------- */
+  loginForm: FormGroup;
+  registerForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router
   ) {
+
+    /* Login Form */
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
 
+    /* Register Form */
     this.registerForm = this.fb.group({
       fullName: ['', Validators.required],
       username: ['', Validators.required],
       password: ['', Validators.required],
-      role: ['', Validators.required]
+      role: ['Admin', Validators.required]
     });
   }
 
-  login() {
-    if (this.loginForm.invalid) return;
+  /* ================= LOGIN ================= */
+login(): void {
+  if (this.loginForm.invalid) return;
 
-    this.loading = true;
-    this.message = '';
+  console.log('Login Data:', this.loginForm.value); // debug
 
-    this.http.post(`${this.apiUrl}/login`, this.loginForm.value)
-      .subscribe({
-        next: (res: any) => {
-          this.loading = false;
+  this.loading = true;
+  this.message = '';
 
-          // Store user data
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('username', res.username);
-          localStorage.setItem('role', res.role);
+  this.http.post<any>(`${this.apiUrl}/login`, this.loginForm.value)
+    .subscribe({
+      next: (res) => {
+        console.log('Login Response:', res); // debug
 
-          this.message = "Login Successful! Redirecting...";
+        this.loading = false;
 
-          // Redirect to dashboard
-          setTimeout(() => {
-            this.router.navigate(['/dashboard']);
-          }, 800);
-        },
-        error: () => {
-          this.loading = false;
-          this.message = "Invalid username or password.";
-        }
-      });
-  }
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('userId', res.userId);
+        localStorage.setItem('username', res.username);
+        localStorage.setItem('role', res.role);
 
-  register() {
+        this.message = 'Login successful. Redirecting...';
+        setTimeout(() => this.router.navigate(['/dashboard']), 700);
+      },
+      error: (err) => {
+        console.error('Login Error:', err); // debug
+        this.loading = false;
+        this.message = err?.error?.message || 'Invalid username or password';
+      }
+    });
+}
+
+
+  /* ================= REGISTER ================= */
+  register(): void {
     if (this.registerForm.invalid) return;
 
     this.loading = true;
@@ -83,17 +99,19 @@ export class LoginComponent {
       .subscribe({
         next: () => {
           this.loading = false;
-          this.message = "User Registered Successfully!";
-          this.registerForm.reset();
+          this.message = 'User registered successfully. Please login.';
+          this.registerForm.reset({ role: 'Admin' });
+          this.isLoginMode = true;
         },
-        error: () => {
+        error: (err) => {
           this.loading = false;
-          this.message = "Registration failed.";
+          this.message = err?.error?.message || 'Registration failed';
         }
       });
   }
 
-  toggleMode() {
+  /* ================= TOGGLE ================= */
+  toggleMode(): void {
     this.isLoginMode = !this.isLoginMode;
     this.message = '';
   }

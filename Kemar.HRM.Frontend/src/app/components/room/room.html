@@ -1,1 +1,73 @@
-<p>room works!</p>
+<div class="page">
+
+  <div class="header">
+    <h2>Rooms</h2>
+    <button class="add-btn" (click)="openAdd()">+ Add Room</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Room No</th>
+        <th>Type</th>
+        <th>Floor</th>
+        <th>Capacity</th>
+        <th>Occupancy</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let r of list">
+        <td>{{ r.roomNumber }}</td>
+        <td>{{ r.roomType }}</td>
+        <td>{{ r.floor }}</td>
+        <td>{{ r.capacity }}</td>
+        <td>{{ r.currentOccupancy }}</td>
+        <td>
+          <button class="edit" (click)="openEdit(r)">Edit</button>
+          <button class="delete" (click)="delete(r.roomId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- MODAL -->
+  <div class="modal" *ngIf="showModal">
+    <div class="modal-box">
+
+      <h3>{{ form.value.roomId ? 'Update Room' : 'Add Room' }}</h3>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <label>Room Number <span>*</span></label>
+        <input type="text" formControlName="roomNumber">
+
+        <label>Room Type <span>*</span></label>
+        <select formControlName="roomType">
+          <option value="">Select</option>
+          <option>Single</option>
+          <option>Double</option>
+          <option>Shared</option>
+        </select>
+
+        <label>Floor <span>*</span></label>
+        <input type="number" formControlName="floor">
+
+        <label>Capacity <span>*</span></label>
+        <input type="number" formControlName="capacity">
+
+        <label>Current Occupancy</label>
+        <input type="number" formControlName="currentOccupancy">
+
+        <div class="actions">
+          <button type="submit" class="save" [disabled]="loading">Save</button>
+          <button type="button" class="reset" (click)="reset()">Reset</button>
+          <button type="button" class="close" (click)="close()">Close</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>

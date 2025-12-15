@@ -1,61 +1,144 @@
+/* ===== Reset ===== */
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* ===== Page Background ===== */
+.h {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3a8a, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* ===== Card Container ===== */
 .container {
-  width: 350px;
-  margin: 60px auto;
-  padding: 25px;
+  width: 100%;
+  max-width: 420px;
   background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.6s ease-in-out;
 }
 
-h2 {
+/* ===== Heading ===== */
+.container h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  color: #1e3a8a;
 }
 
+/* ===== Message ===== */
+.msg {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #d32f2f;
+}
+
+/* ===== Form Groups ===== */
 .form-group {
   margin-bottom: 15px;
 }
 
-label {
-  font-weight: 600;
+/* ===== Labels ===== */
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #333;
+}
+
+/* ===== Inputs & Select ===== */
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: all 0.3s ease;
   font-size: 14px;
 }
 
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+/* ===== Focus Effect ===== */
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
 }
 
+/* ===== Button ===== */
 button {
   width: 100%;
-  padding: 10px;
-  background: #1976d2;
+  padding: 11px;
   border: none;
-  color: #fff;
-  font-weight: bold;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 5px;
 }
 
+/* ===== Button Hover ===== */
+button:hover {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  transform: translateY(-1px);
+}
+
+/* ===== Disabled Button ===== */
 button:disabled {
-  opacity: 0.6;
+  background: #9ca3af;
   cursor: not-allowed;
 }
 
+/* ===== Switch Link ===== */
 .switch {
-  margin-top: 10px;
   text-align: center;
-  color: #1976d2;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #1e3a8a;
   cursor: pointer;
-  font-size: 14px;
+  transition: 0.3s;
 }
 
-.msg {
-  text-align: center;
-  font-weight: bold;
-  color: green;
-  min-height: 20px;
+/* ===== Switch Hover ===== */
+.switch:hover {
+  text-decoration: underline;
+  color: #0f172a;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .container {
+    padding: 22px;
+  }
 }

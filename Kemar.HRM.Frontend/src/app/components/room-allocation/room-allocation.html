@@ -1,1 +1,87 @@
-<p>room-allocation works!</p>
+<div class="page">
+
+  <div class="header">
+    <h2>Room Allocation</h2>
+    <button class="add-btn" (click)="openAdd()">+ Allocate Room</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Room ID</th>
+        <th>Allocated At</th>
+        <th>Released At</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let a of list">
+        <td>{{ a.studentId }}</td>
+        <td>{{ a.roomId }}</td>
+        <td>{{ a.allocatedAt | date:'yyyy-MM-dd' }}</td>
+        <td>{{ a.releasedAt ? (a.releasedAt | date:'yyyy-MM-dd') : '-' }}</td>
+        <td>
+          <span [class.active]="a.isActive" [class.inactive]="!a.isActive">
+            {{ a.isActive ? 'Active' : 'Released' }}
+          </span>
+        </td>
+        <td>
+          <button class="edit" (click)="openEdit(a)">Edit</button>
+          <button class="delete" (click)="delete(a.roomAllocationId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- MODAL -->
+  <div class="modal" *ngIf="showModal">
+    <div class="modal-box">
+
+      <h3>{{ form.value.roomAllocationId ? 'Update Allocation' : 'Allocate Room' }}</h3>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <label>Student ID <span>*</span></label>
+        <input type="number" formControlName="studentId">
+
+        <label>Room ID <span>*</span></label>
+        <input type="number" formControlName="roomId">
+
+        <label>Allocated At <span>*</span></label>
+        <input type="date" formControlName="allocatedAt">
+
+        <label>Released At</label>
+        <input type="date" formControlName="releasedAt">
+
+        <!-- <label>
+          <input type="checkbox" formControlName="isActive">
+          Active
+        </label> -->
+
+
+        <div class="checkbox-row">
+                        <label for="isActive">Active</label> 
+            <input
+            type="checkbox"
+            id="isActive"
+            formControlName="isActive"
+            />
+
+        </div>
+
+
+
+        <div class="actions">
+          <button type="submit" class="save" [disabled]="loading">Save</button>
+          <button type="button" class="reset" (click)="reset()">Reset</button>
+          <button type="button" class="close" (click)="close()">Close</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>

@@ -1,1 +1,72 @@
-<p>student works!</p>
+<div class="page">
+
+  <div class="header">
+    <h2>Students</h2>
+    <button class="add-btn" (click)="openAdd()">+ Add Student</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of list">
+        <td>{{ s.name }}</td>
+        <td>{{ s.gender }}</td>
+        <td>{{ s.phone }}</td>
+        <td>{{ s.email }}</td>
+        <td>
+          <button class="edit" (click)="openEdit(s)">Edit</button>
+          <button class="delete" (click)="delete(s.studentId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- MODAL -->
+  <div class="modal" *ngIf="showModal">
+    <div class="modal-box">
+
+      <h3>{{ form.value.studentId ? 'Update Student' : 'Add Student' }}</h3>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <label>Name <span>*</span></label>
+        <input type="text" formControlName="name">
+
+        <label>Gender <span>*</span></label>
+        <select formControlName="gender">
+          <option value="">Select</option>
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+
+        <label>Phone <span>*</span></label>
+        <input type="text" formControlName="phone">
+
+        <label>Email <span>*</span></label>
+        <input type="email" formControlName="email">
+
+        <label>Address</label>
+        <textarea formControlName="address"></textarea>
+
+        <label>Date Of Admission</label>
+        <input type="date" formControlName="dateOfAdmission">
+
+        <div class="actions">
+          <button type="submit" class="save" [disabled]="loading">Save</button>
+          <button type="button" class="reset" (click)="reset()">Reset</button>
+          <button type="button" class="close" (click)="close()">Close</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
