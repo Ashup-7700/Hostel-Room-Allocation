@@ -74,7 +74,7 @@ Status: ${data.isActive ? 'Active' : 'Inactive'}`
     this.showModal = false;
     this.form.reset();
   }
-  
+
 
     reset(): void {
     this.form.reset({ roomId: 0, isActive: true });
@@ -94,11 +94,23 @@ Status: ${data.isActive ? 'Active' : 'Inactive'}`
         error: () => this.loading = false
       });
   }
-
   delete(id: number): void {
-    if (!confirm('Delete room?')) return;
+  if (!confirm('Delete room?')) return;
 
-    this.http.delete(`${this.api}/delete/${id}`, { headers: this.headers })
-      .subscribe(() => this.load());
-  }
+  this.loading = true;
+  this.http.post(`${this.api}/delete/${id}`, { headers: this.headers })
+    .subscribe({
+      next: res => {
+        this.loading = false;
+        alert('Room deleted successfully'); 
+        this.load(); 
+      },
+      error: err => {
+        this.loading = false;
+        console.error('Delete failed', err);
+        alert('Delete failed');
+      }
+    });
+}
+
 }

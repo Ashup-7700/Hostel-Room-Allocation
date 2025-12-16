@@ -7,21 +7,24 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   selector: 'app-payment',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
-  templateUrl: './payment.html'
+  templateUrl: './payment.html',
+  styleUrls: ['./payment.css']
 })
 export class Payment implements OnInit {
 
   api = 'http://localhost:5027/api/Payment';
   list: any[] = [];
   form!: FormGroup;
+  showModal = false;
+  loading = false;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
       paymentId: [0],
-      studentId: ['', Validators.required],
-      amount: ['', Validators.required],
+      studentId: [null, Validators.required],
+      amount: [null, Validators.required],
       paymentMode: ['', Validators.required],
       paymentStatus: ['Paid']
     });
@@ -30,24 +33,94 @@ export class Payment implements OnInit {
   }
 
   get headers() {
-    return { Authorization: `Bearer ${localStorage.getItem('token')}` };
+    return {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json'
+    };
   }
 
-  load() {
-    this.http.get<any>(`${this.api}/getAll`, { headers: this.headers })
-      .subscribe(res => this.list = res.data ?? []);
+  // ✅ MUST use getByFilter (matches backend)
+  load(): void {
+    this.http.post<any>(
+      `${this.api}/getByFilter`,
+      {},
+      { headers: this.headers }
+    ).subscribe({
+      next: res => this.list = res?.data ?? [],
+      error: err => console.error('Load error', err)
+    });
   }
 
-  save() {
-    this.http.post(`${this.api}/addOrUpdate`, this.form.value, { headers: this.headers })
-      .subscribe(() => {
-        this.form.reset({ paymentId: 0 });
+  openAdd(): void {
+    this.form.reset({
+      paymentId: 0,
+      paymentStatus: 'Paid'
+    });
+    this.showModal = true;
+  }
+
+  openEdit(data: any): void {
+    this.form.patchValue(data);
+    this.showModal = true;
+  }
+
+  viewDetails(data: any): void {
+    alert(`Payment Details:
+Student ID: ${data.studentId}
+Amount: ${data.amount}
+Mode: ${data.paymentMode}
+Status: ${data.paymentStatus}`);
+  }
+
+  close(): void {
+    this.showModal = false;
+    this.form.reset({ paymentId: 0 });
+  }
+
+  reset(): void {
+    this.form.reset({
+      paymentId: 0,
+      paymentStatus: 'Paid'
+    });
+  }
+
+  // ✅ IMPORTANT FIX: send clean numeric payload
+  save(): void {
+    if (this.form.invalid) return;
+
+    const payload = {
+      paymentId: this.form.value.paymentId || 0,
+      studentId: Number(this.form.value.studentId),
+      amount: Number(this.form.value.amount),
+      paymentMode: this.form.value.paymentMode,
+      paymentStatus: this.form.value.paymentStatus
+    };
+
+    this.loading = true;
+
+    this.http.post(
+      `${this.api}/addOrUpdate`,
+      payload,
+      { headers: this.headers }
+    ).subscribe({
+      next: () => {
+        this.loading = false;
+        this.close();
         this.load();
-      });
+      },
+      error: err => {
+        console.error('Save error', err);
+        this.loading = false;
+      }
+    });
   }
 
-  delete(id: number) {
-    this.http.delete(`${this.api}/delete/${id}`, { headers: this.headers })
-      .subscribe(() => this.load());
+  delete(id: number): void {
+    if (!confirm('Delete this payment?')) return;
+
+    this.http.delete(
+      `${this.api}/delete/${id}`,
+      { headers: this.headers }
+    ).subscribe(() => this.load());
   }
 }

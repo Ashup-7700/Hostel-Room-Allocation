@@ -147,7 +147,7 @@
     "ContainingType": "Kemar.HRM.API.Controllers.RoomController",
     "Method": "Delete",
     "RelativePath": "api/Room/delete/{id}",
-    "HttpMethod": "DELETE",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [

@@ -14,6 +14,7 @@
 
         public string PaymentStatus { get; set; } = string.Empty;
 
-        public int? CreatedByUserId { get; set; } 
+        public int? CreatedByUserId { get; set; }
+        public string? CreatedBy { get; set; }
     }
 }

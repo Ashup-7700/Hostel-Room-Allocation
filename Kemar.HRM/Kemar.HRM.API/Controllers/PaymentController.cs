@@ -4,7 +4,6 @@ using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Kemar.HRM.API.Controllers
 {
@@ -23,17 +22,18 @@ namespace Kemar.HRM.API.Controllers
         [Authorize]
         public async Task<IActionResult> AddOrUpdate([FromBody] PaymentRequest request)
         {
-            // Try to get the user ID from claims
+
             int? currentUserId = null;
 
-            // Look for "userId" exactly as in JWT payload
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            var username = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value ?? "System";
 
             if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int parsedUserId))
             {
-                currentUserId = parsedUserId;
-                request.CreatedByUserId = currentUserId; // assign real user ID
+                request.CreatedByUserId = parsedUserId;
+                request.CreatedBy = username;
             }
+
 
             var result = await _paymentManager.AddOrUpdateAsync(request);
             return CommonHelper.ReturnActionResultByStatus(result, this);

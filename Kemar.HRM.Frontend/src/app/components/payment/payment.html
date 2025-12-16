@@ -1,31 +1,72 @@
-<div class="student-container">
+<div class="page">
 
-  <h2>Payments</h2>
-
-  <form [formGroup]="form" (ngSubmit)="save()">
-    <input formControlName="studentId" placeholder="Student ID">
-    <input formControlName="amount" placeholder="Amount">
-    <input formControlName="paymentMode" placeholder="Mode (Cash / UPI)">
-    <button type="submit">Save</button>
-  </form>
+  <div class="header">
+    <h2>Payments</h2>
+    <button
+      class="add-btn"
+      (click)="openAdd()"
+      data-tooltip="Add Payment">
+      +
+    </button>
+  </div>
 
   <table>
-    <tr>
-      <th>Student</th>
-      <th>Amount</th>
-      <th>Mode</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-    <tr *ngFor="let p of list">
-      <td>{{ p.studentId }}</td>
-      <td>{{ p.amount }}</td>
-      <td>{{ p.paymentMode }}</td>
-      <td>{{ p.paymentStatus }}</td>
-      <td>
-        <button (click)="delete(p.paymentId)">Delete</button>
-      </td>
-    </tr>
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Amount</th>
+        <th>Mode</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of list">
+        <td>{{ p.studentId }}</td>
+        <td>{{ p.amount }}</td>
+        <td>{{ p.paymentMode }}</td>
+        <td>
+          <span [class.active]="p.paymentStatus==='Paid'" [class.inactive]="p.paymentStatus!=='Paid'">
+            {{ p.paymentStatus }}
+          </span>
+        </td>
+        <td>
+          <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(p)">👁</button>
+          <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(p)">✏️</button>
+          <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(p.paymentId)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
   </table>
+
+  <!-- MODAL -->
+  <div class="modal" *ngIf="showModal">
+    <div class="modal-box">
+
+      <h3>{{ form.value.paymentId ? 'Update Payment' : 'Add Payment' }}</h3>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <label>Student ID <span>*</span></label>
+        <input type="number" formControlName="studentId">
+
+        <label>Amount <span>*</span></label>
+        <input type="number" formControlName="amount">
+
+        <label>Payment Mode <span>*</span></label>
+        <input type="text" formControlName="paymentMode" placeholder="Cash / UPI">
+
+        <label>Status</label>
+        <input type="text" formControlName="paymentStatus" readonly>
+
+        <div class="actions">
+          <button type="submit" class="save">Save</button>
+          <button type="button" class="reset" (click)="reset()">Reset</button>
+          <button type="button" class="close" (click)="close()">Close</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
 
 </div>

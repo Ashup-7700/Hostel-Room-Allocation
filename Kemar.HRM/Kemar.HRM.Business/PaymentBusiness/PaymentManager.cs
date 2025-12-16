@@ -4,10 +4,6 @@ using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Response;
 using Kemar.HRM.Repository.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Kemar.HRM.Business
 {
@@ -41,7 +37,7 @@ namespace Kemar.HRM.Business
 
             if (existingPaymentsResult.IsSuccess && existingPaymentsResult.Data is List<PaymentResponse> existingPayments)
             {
-                if (request.PaymentId == 0) // Only for new payments
+                if (request.PaymentId == 0) 
                 {
                     var duplicate = existingPayments
                         .FirstOrDefault(p => p.PaymentDate.Date == request.PaymentDate.Date &&
