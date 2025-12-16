@@ -10,14 +10,14 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   templateUrl: './room.html',
   styleUrls: ['./room.css']
 })
-export class Room implements OnInit {
+export class RoomComponent implements OnInit {
 
   api = 'http://localhost:5027/api/Room';
 
   list: any[] = [];
   form!: FormGroup;
-  loading = false;
   showModal = false;
+  loading = false;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {}
 
@@ -26,32 +26,30 @@ export class Room implements OnInit {
       roomId: [0],
       roomNumber: ['', Validators.required],
       roomType: ['', Validators.required],
-      floor: [0, Validators.required],
-      capacity: [0, Validators.required],
-      currentOccupancy: [0]
+      floor: ['', Validators.required],
+      capacity: ['', Validators.required],
+      currentOccupancy: [0],
+      isActive: [true]
     });
 
     this.load();
   }
 
   get headers() {
-    return {
-      Authorization: `Bearer ${localStorage.getItem('token')}`
-    };
+    return { Authorization: `Bearer ${localStorage.getItem('token')}` };
   }
 
   load(): void {
-    const filter = {}; // empty filter = get all
-
-    this.http.post<any>(`${this.api}/getByFilter`, filter, { headers: this.headers })
-      .subscribe({
-        next: res => this.list = res.data ?? [],
-        error: err => console.error(err)
-      });
+    this.http.post<any>(`${this.api}/GetByFilter`, {}, { headers: this.headers })
+      .subscribe(res => this.list = res.data ?? []);
   }
 
   openAdd(): void {
-    this.form.reset({ roomId: 0, currentOccupancy: 0 });
+    this.form.reset({
+      roomId: 0,
+      currentOccupancy: 0,
+      isActive: true
+    });
     this.showModal = true;
   }
 
@@ -60,13 +58,26 @@ export class Room implements OnInit {
     this.showModal = true;
   }
 
-  close(): void {
-    this.showModal = false;
-    this.form.reset({ roomId: 0 });
+  viewDetails(data: any): void {
+    alert(
+`Room Details
+Room No: ${data.roomNumber}
+Type: ${data.roomType}
+Floor: ${data.floor}
+Capacity: ${data.capacity}
+Occupancy: ${data.currentOccupancy}
+Status: ${data.isActive ? 'Active' : 'Inactive'}`
+    );
   }
 
-  reset(): void {
-    this.form.reset({ roomId: 0 });
+  close(): void {
+    this.showModal = false;
+    this.form.reset();
+  }
+  
+
+    reset(): void {
+    this.form.reset({ roomId: 0, isActive: true });
   }
 
   save(): void {

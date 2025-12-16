@@ -3,9 +3,7 @@
 
   <h2>{{ isLoginMode ? 'Login' : 'Register' }}</h2>
 
-
   <p class="msg">{{ message }}</p>
-
 
   <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="login()">
     <div class="form-group">
@@ -22,7 +20,6 @@
 
     <p class="switch" (click)="toggleMode()">Don't have an account? Register</p>
   </form>
-
 
   <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="register()">
     <div class="form-group">

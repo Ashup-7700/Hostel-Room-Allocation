@@ -77,6 +77,17 @@ export class RoomAllocationComponent implements OnInit {
   });
 }
 
+viewDetails(data: any): void {
+  console.log('Room Allocation Details:', data);
+  alert(
+    `Room Allocation Details:
+Student ID: ${data.studentId}
+Room ID: ${data.roomId}
+Allocated At: ${data.allocatedAt}
+Released At: ${data.releasedAt ?? '-'}
+Status: ${data.isActive ? 'Active' : 'Released'}`
+  );
+}
 
   close(): void {
     this.showModal = false;

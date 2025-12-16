@@ -10,15 +10,14 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   templateUrl: './student.html',
   styleUrls: ['./student.css']
 })
-export class Student implements OnInit {
+export class StudentComponent implements OnInit {
 
   api = 'http://localhost:5027/api/Student';
 
   list: any[] = [];
   form!: FormGroup;
-  loading = false;
-  message = '';
   showModal = false;
+  loading = false;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {}
 
@@ -30,40 +29,55 @@ export class Student implements OnInit {
       phone: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       address: ['', Validators.required],
-      dateOfAdmission: ['', Validators.required]
+      dateOfAdmission: ['', Validators.required],
+      isActive: [true]
     });
 
     this.load();
   }
 
   get headers() {
-    return {
-      Authorization: `Bearer ${localStorage.getItem('token')}`
-    };
+    return { Authorization: `Bearer ${localStorage.getItem('token')}` };
   }
 
   load(): void {
-    this.http.get<any>(`${this.api}/getAll`, { headers: this.headers })
-      .subscribe(res => this.list = res.data ?? []);
-  }
+  this.http.get<any>(`${this.api}/getAll`, { headers: this.headers })
+    .subscribe(res => this.list = res.data ?? []);
+}
 
   openAdd(): void {
-    this.form.reset({ studentId: 0 });
+    this.form.reset({ studentId: 0, isActive: true });
     this.showModal = true;
   }
 
   openEdit(data: any): void {
-    this.form.patchValue(data);
+    this.form.patchValue({
+      ...data,
+      dateOfAdmission: data.dateOfAdmission
+        ? new Date(data.dateOfAdmission).toISOString().split('T')[0]
+        : ''
+    });
     this.showModal = true;
+  }
+
+  viewDetails(data: any): void {
+    alert(
+`Student Details
+Name: ${data.name}
+Gender: ${data.gender}
+Phone: ${data.phone}
+Email: ${data.email}
+Admission Date: ${data.dateOfAdmission}
+Status: ${data.isActive ? 'Active' : 'Inactive'}`
+    );
   }
 
   close(): void {
     this.showModal = false;
-    this.form.reset({ studentId: 0 });
+    this.form.reset();
   }
-
-  reset(): void {
-    this.form.reset({ studentId: 0 });
+    reset(): void {
+    this.form.reset({ studentId: 0, isActive: true });
   }
 
   save(): void {
@@ -87,4 +101,5 @@ export class Student implements OnInit {
     this.http.delete(`${this.api}/delete/${id}`, { headers: this.headers })
       .subscribe(() => this.load());
   }
+
 }

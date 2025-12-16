@@ -22,15 +22,12 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
 
-  /* ---------------- API ---------------- */
   private apiUrl = 'http://localhost:5027/api/User';
 
-  /* ---------------- UI State ---------------- */
   isLoginMode = true;
   loading = false;
   message = '';
 
-  /* ---------------- Forms ---------------- */
   loginForm: FormGroup;
   registerForm: FormGroup;
 
@@ -40,13 +37,11 @@ export class LoginComponent {
     private router: Router
   ) {
 
-    /* Login Form */
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
 
-    /* Register Form */
     this.registerForm = this.fb.group({
       fullName: ['', Validators.required],
       username: ['', Validators.required],
@@ -55,11 +50,10 @@ export class LoginComponent {
     });
   }
 
-  /* ================= LOGIN ================= */
 login(): void {
   if (this.loginForm.invalid) return;
 
-  console.log('Login Data:', this.loginForm.value); // debug
+  console.log('Login Data:', this.loginForm.value); 
 
   this.loading = true;
   this.message = '';
@@ -67,7 +61,7 @@ login(): void {
   this.http.post<any>(`${this.apiUrl}/login`, this.loginForm.value)
     .subscribe({
       next: (res) => {
-        console.log('Login Response:', res); // debug
+        console.log('Login Response:', res); 
 
         this.loading = false;
 
@@ -76,19 +70,17 @@ login(): void {
         localStorage.setItem('username', res.username);
         localStorage.setItem('role', res.role);
 
-        this.message = 'Login successful. Redirecting...';
+        this.message = 'Login successful.';
         setTimeout(() => this.router.navigate(['/dashboard']), 700);
       },
       error: (err) => {
-        console.error('Login Error:', err); // debug
+        console.error('Login Error:', err); 
         this.loading = false;
         this.message = err?.error?.message || 'Invalid username or password';
       }
     });
 }
 
-
-  /* ================= REGISTER ================= */
   register(): void {
     if (this.registerForm.invalid) return;
 
@@ -105,12 +97,11 @@ login(): void {
         },
         error: (err) => {
           this.loading = false;
-          this.message = err?.error?.message || 'Registration failed';
+          this.message = err?.error?.message || 'Registration failed ';
         }
       });
   }
 
-  /* ================= TOGGLE ================= */
   toggleMode(): void {
     this.isLoginMode = !this.isLoginMode;
     this.message = '';

@@ -2,7 +2,7 @@
 
   <div class="header">
     <h2>Students</h2>
-    <button class="add-btn" (click)="openAdd()">+ Add Student</button>
+    <button class="add-btn" data-tooltip="Add Student" (click)="openAdd()">+</button>
   </div>
 
   <table>
@@ -11,19 +11,29 @@
         <th>Name</th>
         <th>Gender</th>
         <th>Phone</th>
-        <th>Email</th>
+        <th>Admission Date</th>
+        <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
+
     <tbody>
       <tr *ngFor="let s of list">
         <td>{{ s.name }}</td>
         <td>{{ s.gender }}</td>
         <td>{{ s.phone }}</td>
-        <td>{{ s.email }}</td>
+        <td>{{ s.dateOfAdmission | date:'yyyy-MM-dd' }}</td>
+
         <td>
-          <button class="edit" (click)="openEdit(s)">Edit</button>
-          <button class="delete" (click)="delete(s.studentId)">Delete</button>
+          <span [class.active]="s.isActive" [class.inactive]="!s.isActive">
+            {{ s.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+
+        <td>
+          <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(s)">✏️</button>
+          <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(s)">👁</button>
+          <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(s.studentId)">🗑</button>
         </td>
       </tr>
     </tbody>
@@ -32,35 +42,35 @@
   <!-- MODAL -->
   <div class="modal" *ngIf="showModal">
     <div class="modal-box">
-
       <h3>{{ form.value.studentId ? 'Update Student' : 'Add Student' }}</h3>
 
       <form [formGroup]="form" (ngSubmit)="save()">
 
         <label>Name <span>*</span></label>
-        <input type="text" formControlName="name">
+        <input formControlName="name">
 
         <label>Gender <span>*</span></label>
-        <select formControlName="gender">
-          <option value="">Select</option>
-          <option>Male</option>
-          <option>Female</option>
-        </select>
+        <input formControlName="gender">
 
         <label>Phone <span>*</span></label>
-        <input type="text" formControlName="phone">
+        <input formControlName="phone">
 
         <label>Email <span>*</span></label>
-        <input type="email" formControlName="email">
+        <input formControlName="email">
 
-        <label>Address</label>
-        <textarea formControlName="address"></textarea>
+        <label>Address <span>*</span></label>
+        <input formControlName="address">
 
-        <label>Date Of Admission</label>
+        <label>Date Of Admission <span>*</span></label>
         <input type="date" formControlName="dateOfAdmission">
 
+        <div class="checkbox-row">
+          <label>Active</label>
+          <input type="checkbox" formControlName="isActive">
+        </div>
+
         <div class="actions">
-          <button type="submit" class="save" [disabled]="loading">Save</button>
+          <button class="save">Save</button>
           <button type="button" class="reset" (click)="reset()">Reset</button>
           <button type="button" class="close" (click)="close()">Close</button>
         </div>

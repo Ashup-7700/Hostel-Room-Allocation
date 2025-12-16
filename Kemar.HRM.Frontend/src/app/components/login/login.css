@@ -1,10 +1,8 @@
-/* ===== Reset ===== */
 * {
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-/* ===== Page Background ===== */
 .h {
   min-height: 100vh;
   background: linear-gradient(135deg, #1e3a8a, #0f172a);
@@ -14,7 +12,6 @@
   animation: fadeIn 1s ease-in-out;
 }
 
-/* ===== Card Container ===== */
 .container {
   width: 100%;
   max-width: 420px;
@@ -25,14 +22,12 @@
   animation: slideUp 0.6s ease-in-out;
 }
 
-/* ===== Heading ===== */
 .container h2 {
   text-align: center;
   margin-bottom: 15px;
   color: #1e3a8a;
 }
 
-/* ===== Message ===== */
 .msg {
   text-align: center;
   margin-bottom: 12px;
@@ -40,12 +35,10 @@
   color: #d32f2f;
 }
 
-/* ===== Form Groups ===== */
 .form-group {
   margin-bottom: 15px;
 }
 
-/* ===== Labels ===== */
 .form-group label {
   display: block;
   margin-bottom: 5px;
@@ -53,7 +46,6 @@
   color: #333;
 }
 
-/* ===== Inputs & Select ===== */
 .form-group input,
 .form-group select {
   width: 100%;
@@ -65,14 +57,12 @@
   font-size: 14px;
 }
 
-/* ===== Focus Effect ===== */
 .form-group input:focus,
 .form-group select:focus {
   border-color: #1e3a8a;
   box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
 }
 
-/* ===== Button ===== */
 button {
   width: 100%;
   padding: 11px;
@@ -87,19 +77,16 @@ button {
   margin-top: 5px;
 }
 
-/* ===== Button Hover ===== */
 button:hover {
   background: linear-gradient(135deg, #2563eb, #1e3a8a);
   transform: translateY(-1px);
 }
 
-/* ===== Disabled Button ===== */
 button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
 }
 
-/* ===== Switch Link ===== */
 .switch {
   text-align: center;
   margin-top: 12px;
@@ -109,13 +96,11 @@ button:disabled {
   transition: 0.3s;
 }
 
-/* ===== Switch Hover ===== */
 .switch:hover {
   text-decoration: underline;
   color: #0f172a;
 }
 
-/* ===== Animations ===== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -136,7 +121,6 @@ button:disabled {
   }
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 480px) {
   .container {
     padding: 22px;

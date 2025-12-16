@@ -10,11 +10,11 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
 
   { path: 'students', loadComponent: () =>
-      import('./components/student/student').then(m => m.Student)
+      import('./components/student/student').then(m => m.StudentComponent)
   },
 
   { path: 'rooms', loadComponent: () =>
-      import('./components/room/room').then(m => m.Room)
+      import('./components/room/room').then(m => m.RoomComponent)
   },
 
   { path: 'allocation', loadComponent: () =>

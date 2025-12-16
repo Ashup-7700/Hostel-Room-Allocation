@@ -1,4 +1,4 @@
-/* PAGE */
+/* ===== PAGE ===== */
 .page {
   padding: 24px;
   background: #f1f5f9;
@@ -6,7 +6,7 @@
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
 .header {
   display: flex;
   justify-content: space-between;
@@ -19,30 +19,69 @@
   color: #1e293b;
 }
 
+/* ===== ADD BUTTON ===== */
 .add-btn {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+  position: relative;
+  background: #2563eb;
   color: #fff;
   border: none;
+  width: 44px;
   height: 44px;
-  padding: 0 18px;
-  border-radius: 8px;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 50%;
   cursor: pointer;
-  font-weight: 600;
   transition: 0.3s;
 }
 
 .add-btn:hover {
-  opacity: 0.9;
+  background: #1d4ed8;
 }
 
-/* TABLE */
+/* ===== ADD BUTTON TOOLTIP ===== */
+.add-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+.add-btn::before {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #111827 transparent;
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.add-btn:hover::after,
+.add-btn:hover::before {
+  opacity: 1;
+}
+
+/* ===== TABLE ===== */
 table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  table-layout: fixed; /* IMPORTANT: keeps columns aligned */
+  table-layout: fixed;
 }
 
 thead {
@@ -63,7 +102,7 @@ td {
   color: #334155;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Prevents breaking */
+  text-overflow: ellipsis;
 }
 
 tbody tr {
@@ -75,15 +114,33 @@ tbody tr:hover {
   background: #f8fafc;
 }
 
-/* COLUMN WIDTH CONTROL */
-th:nth-child(1), td:nth-child(1) { width: 15%; } /* Room No */
-th:nth-child(2), td:nth-child(2) { width: 15%; } /* Type */
-th:nth-child(3), td:nth-child(3) { width: 10%; } /* Floor */
-th:nth-child(4), td:nth-child(4) { width: 15%; } /* Capacity */
-th:nth-child(5), td:nth-child(5) { width: 15%; } /* Occupancy */
-th:nth-child(6), td:nth-child(6) { width: 20%; } /* Actions */
+th:nth-child(1), td:nth-child(1) { width: 12%; }
+th:nth-child(2), td:nth-child(2) { width: 12%; }
+th:nth-child(3), td:nth-child(3) { width: 18%; }
+th:nth-child(4), td:nth-child(4) { width: 18%; }
+th:nth-child(5), td:nth-child(5) { width: 15%; }
+th:nth-child(6), td:nth-child(6) { width: 25%; }
 
-/* ACTION BUTTONS */
+.active {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.inactive {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
 .edit {
   background: #f59e0b;
   color: #fff;
@@ -95,6 +152,10 @@ th:nth-child(6), td:nth-child(6) { width: 20%; } /* Actions */
   font-size: 13px;
 }
 
+.edit:hover {
+  background: #d97706;
+}
+
 .delete {
   background: #dc2626;
   color: #fff;
@@ -103,9 +164,80 @@ th:nth-child(6), td:nth-child(6) { width: 20%; } /* Actions */
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
+  margin-left: 6px;
 }
 
-/* MODAL BACKDROP */
+.delete:hover {
+  background: #b91c1c;
+}
+
+/* ===== ICON ACTION BUTTONS ===== */
+.icon-btn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  position: relative;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.icon-btn:hover {
+  background: #e5e7eb;
+  transform: scale(1.1);
+}
+
+.icon-btn.view {
+  color: #2563eb;
+}
+
+.icon-btn.edit {
+  color: #f59e0b;
+}
+
+.icon-btn.delete {
+  color: #dc2626;
+}
+
+/* ===== ICON TOOLTIP ===== */
+.icon-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #fff;
+  padding: 5px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+.icon-btn::before {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #111827 transparent;
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.icon-btn:hover::after,
+.icon-btn:hover::before {
+  opacity: 1;
+}
+
+/* ===== MODAL ===== */
 .modal {
   position: fixed;
   inset: 0;
@@ -116,7 +248,6 @@ th:nth-child(6), td:nth-child(6) { width: 20%; } /* Actions */
   z-index: 1000;
 }
 
-/* MODAL BOX */
 .modal-box {
   background: #fff;
   padding: 22px;
@@ -127,14 +258,8 @@ th:nth-child(6), td:nth-child(6) { width: 20%; } /* Actions */
 }
 
 @keyframes popup {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .modal-box h3 {
@@ -143,18 +268,18 @@ th:nth-child(6), td:nth-child(6) { width: 20%; } /* Actions */
   color: #1e293b;
 }
 
-/* FORM */
 label {
   font-size: 13px;
   font-weight: 600;
   color: #475569;
+  display: block;
 }
 
 label span {
   color: red;
 }
 
-input, select {
+input {
   width: 100%;
   padding: 9px;
   margin: 6px 0 12px;
@@ -163,12 +288,32 @@ input, select {
   font-size: 14px;
 }
 
-input:focus, select:focus {
+input:focus {
   outline: none;
   border-color: #2563eb;
 }
 
-/* MODAL ACTIONS */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.checkbox-row label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
 .actions {
   display: flex;
   justify-content: space-between;

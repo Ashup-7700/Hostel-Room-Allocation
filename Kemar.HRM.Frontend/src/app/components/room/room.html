@@ -2,7 +2,7 @@
 
   <div class="header">
     <h2>Rooms</h2>
-    <button class="add-btn" (click)="openAdd()">+ Add Room</button>
+    <button class="add-btn" data-tooltip="Add Room" (click)="openAdd()">+</button>
   </div>
 
   <table>
@@ -12,7 +12,7 @@
         <th>Type</th>
         <th>Floor</th>
         <th>Capacity</th>
-        <th>Occupancy</th>
+        <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -23,10 +23,17 @@
         <td>{{ r.roomType }}</td>
         <td>{{ r.floor }}</td>
         <td>{{ r.capacity }}</td>
-        <td>{{ r.currentOccupancy }}</td>
+
         <td>
-          <button class="edit" (click)="openEdit(r)">Edit</button>
-          <button class="delete" (click)="delete(r.roomId)">Delete</button>
+          <span [class.active]="r.isActive" [class.inactive]="!r.isActive">
+            {{ r.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+
+        <td>
+          <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(r)">✏️</button>
+          <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(r)">👁</button>
+          <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(r.roomId)">🗑</button>
         </td>
       </tr>
     </tbody>
@@ -35,21 +42,15 @@
   <!-- MODAL -->
   <div class="modal" *ngIf="showModal">
     <div class="modal-box">
-
       <h3>{{ form.value.roomId ? 'Update Room' : 'Add Room' }}</h3>
 
       <form [formGroup]="form" (ngSubmit)="save()">
 
         <label>Room Number <span>*</span></label>
-        <input type="text" formControlName="roomNumber">
+        <input formControlName="roomNumber">
 
         <label>Room Type <span>*</span></label>
-        <select formControlName="roomType">
-          <option value="">Select</option>
-          <option>Single</option>
-          <option>Double</option>
-          <option>Shared</option>
-        </select>
+        <input formControlName="roomType">
 
         <label>Floor <span>*</span></label>
         <input type="number" formControlName="floor">
@@ -57,11 +58,13 @@
         <label>Capacity <span>*</span></label>
         <input type="number" formControlName="capacity">
 
-        <label>Current Occupancy</label>
-        <input type="number" formControlName="currentOccupancy">
+        <div class="checkbox-row">
+          <label>Active</label>
+          <input type="checkbox" formControlName="isActive">
+        </div>
 
         <div class="actions">
-          <button type="submit" class="save" [disabled]="loading">Save</button>
+          <button class="save">Save</button>
           <button type="button" class="reset" (click)="reset()">Reset</button>
           <button type="button" class="close" (click)="close()">Close</button>
         </div>
