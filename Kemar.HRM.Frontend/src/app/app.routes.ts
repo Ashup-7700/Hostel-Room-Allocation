@@ -52,7 +52,7 @@ export const routes: Routes = [
         path: 'fee-structure',
         loadComponent: () =>
           import('./components/fee-structure/fee-structure')
-            .then(m => m.FeeStructure)
+            .then(m => m.FeeStructureComponent)
       }
     ]
   },

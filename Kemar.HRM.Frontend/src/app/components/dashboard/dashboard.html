@@ -2,10 +2,36 @@
   <h1>Dashboard</h1>
 
   <div class="card-container">
-    <div class="card">Total Students</div>
-    <div class="card">Available Rooms</div>
-    <div class="card">Allocated Rooms</div>
-    <div class="card">Pending Payments</div>
-  </div>
 
+    <div class="card">
+      <h3>Total Students</h3>
+      <p>{{ totalStudents || 0 }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Available Rooms</h3>
+      <p>{{ availableRooms || 0 }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Allocated Rooms</h3>
+      <p>{{ allocatedRooms || 0 }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Vacant Rooms</h3>
+      <p>{{ vacantRooms || 0 }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Pending Payments</h3>
+      <p>{{ pendingPayments || 0 }}</p>
+    </div>
+
+    <div class="card">
+      <h3>Total Fee Collected</h3>
+      <p>₹ {{ totalFeeCollected || 0 }}</p>
+    </div>
+
+  </div>
 </div>

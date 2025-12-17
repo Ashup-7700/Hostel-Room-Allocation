@@ -1,4 +1,3 @@
-/* ===== SELECT (DROPDOWN) STYLE – ADD ONLY ===== */
 select {
   width: 100%;
   padding: 9px;
@@ -9,6 +8,11 @@ select {
   background-color: #fff;
   color: #334155;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='%23334155' stroke-width='2' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
 }
 
 select:focus {
@@ -16,15 +20,13 @@ select:focus {
   border-color: #2563eb;
 }
 
-/* Optional: disabled / readonly look */
-select:disabled {
-  background: #f1f5f9;
-  cursor: not-allowed;
+select option:disabled {
+  color: #94a3b8;
 }
 
-
-
-
+select:hover {
+  border-color: #93c5fd;
+}
 
 .page {
   padding: 24px;
@@ -112,10 +114,17 @@ thead {
   color: #fff;
 }
 
-th, td {
-  padding: 12px 14px;
+th {
+  padding: 14px;
   font-size: 14px;
   text-align: left;
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px;
+  font-size: 14px;
+  color: #334155;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -197,9 +206,17 @@ tbody tr:hover {
   transform: scale(1.1);
 }
 
-.icon-btn.view { color: #2563eb; }
-.icon-btn.edit { color: #f59e0b; }
-.icon-btn.delete { color: #dc2626; }
+.icon-btn.view {
+  color: #2563eb;
+}
+
+.icon-btn.edit {
+  color: #f59e0b;
+}
+
+.icon-btn.delete {
+  color: #dc2626;
+}
 
 .icon-btn::after {
   content: attr(data-tooltip);
@@ -232,12 +249,14 @@ tbody tr:hover {
 }
 
 .icon-btn:hover::after,
-.icon-btn:hover::before { opacity: 1; }
+.icon-btn:hover::before {
+  opacity: 1;
+}
 
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(15,23,42,0.6);
+  background: rgba(15, 23, 42, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -249,13 +268,19 @@ tbody tr:hover {
   padding: 22px;
   width: 420px;
   border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   animation: popup 0.25s ease;
 }
 
 @keyframes popup {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal-box h3 {
@@ -271,7 +296,9 @@ label {
   display: block;
 }
 
-label span { color: red; }
+label span {
+  color: red;
+}
 
 input {
   width: 100%;
@@ -287,6 +314,27 @@ input:focus {
   border-color: #2563eb;
 }
 
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.checkbox-row label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
 .actions {
   display: flex;
 }
@@ -300,6 +348,16 @@ input:focus {
   margin-right: 10px;
 }
 
-.save { background: #16a34a; color: #fff; }
-.reset { background: #eab308; }
-.close { background: #64748b; color: #fff; }
+.save {
+  background: #16a34a;
+  color: #fff;
+}
+
+.reset {
+  background: #eab308;
+}
+
+.close {
+  background: #64748b;
+  color: #fff;
+}

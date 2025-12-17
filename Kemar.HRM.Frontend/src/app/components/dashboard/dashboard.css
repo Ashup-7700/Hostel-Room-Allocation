@@ -1,20 +1,69 @@
 .dashboard-container {
-  padding: 20px;
+  padding: 24px;
+  background: #f1f5f9;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+.dashboard-container h1 {
+  text-align: center;
+  font-size: 28px;
+  color: #1e3a8a;
+  margin-bottom: 30px;
 }
 
 .card-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 20px;
-  flex-wrap: wrap;
+  cursor: pointer;
 }
 
 .card {
-  background: white;
+  background: #ffffff;
+  border-radius: 14px;
   padding: 20px;
-  border-radius: 10px;
-  width: 250px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  font-size: 18px;
-  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-  
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card h3 {
+  font-size: 18px;
+  color: #1e3a8a;
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2563eb;
+  margin: 0;
+}
+
+.card:nth-child(1) p { color: #1d4ed8; }  /* Total Students */
+.card:nth-child(2) p { color: #059669; }  /* Available Rooms */
+.card:nth-child(3) p { color: #d97706; }  /* Allocated Rooms */
+.card:nth-child(4) p { color: #b91c1c; }  /* Vacant Rooms */
+.card:nth-child(5) p { color: #facc15; }  /* Pending Payments */
+.card:nth-child(6) p { color: #9333ea; }  /* Total Fee Collected */
+
+@media (max-width: 600px) {
+  .card-container {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+  }
+
+  .card h3 {
+    font-size: 16px;
+  }
+
+  .card p {
+    font-size: 18px;
+  }
+}

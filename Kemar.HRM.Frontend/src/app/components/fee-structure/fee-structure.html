@@ -1,70 +1,68 @@
-<div class="student-container">
+<div class="page">
 
-  <h2>Fee Structure</h2>
+  <div class="header">
+    <h2>Fee Structures</h2>
+    <button class="add-btn" (click)="openAdd()">+</button>
+  </div>
 
-  <p class="msg">{{ message }}</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Room Type</th>
+        <th>Monthly Rent</th>
+        <th>Security Deposit</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
 
-  <!-- Fee Structure Form -->
-  <form [formGroup]="form" (ngSubmit)="save()" class="student-form">
+    <tbody>
+      <tr *ngFor="let f of list">
+        <td>{{ f.roomType }}</td>
+        <td>{{ f.monthlyRent }}</td>
+        <td>{{ f.securityDeposit }}</td>
+        <td>
+          <span [class.active]="f.isActive" [class.inactive]="!f.isActive">
+            {{ f.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+        <td>
+          <button class="icon-btn edit" (click)="openEdit(f)">✏️</button>
+          <button class="icon-btn view" (click)="viewDetails(f)">👁</button>
+          <button class="icon-btn delete" (click)="delete(f.feeStructureId)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-    <input type="hidden" formControlName="feeStructureId">
+  <div class="modal" *ngIf="showModal">
+    <div class="modal-box">
+      <h3>{{ form.value.feeStructureId ? 'Update Fee Structure' : 'Add Fee Structure' }}</h3>
 
-    <div class="form-group">
-      <label>Room Type</label>
-      <input formControlName="roomType" type="text" placeholder="Single / Double / Dormitory">
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <label>Room Type <span>*</span></label>
+        <input formControlName="roomType">
+
+        <label>Monthly Rent <span>*</span></label>
+        <input type="number" formControlName="monthlyRent">
+
+        <label>Security Deposit <span>*</span></label>
+        <input type="number" formControlName="securityDeposit">
+
+        <div class="checkbox-row">
+          <label>Active</label>
+          <input type="checkbox" formControlName="isActive">
+        </div>
+
+        <div class="actions">
+          <button class="save">Save</button>
+          <button type="button" class="reset" (click)="reset()">Reset</button>
+          <button type="button" class="close" (click)="close()">Close</button>
+        </div>
+
+      </form>
     </div>
-
-    <div class="form-group">
-      <label>Amount</label>
-      <input formControlName="amount" type="number" placeholder="Enter Amount">
-    </div>
-
-    <div class="form-group">
-      <label>Description</label>
-      <textarea formControlName="description" placeholder="Optional description"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label>
-        <input type="checkbox" formControlName="isActive">
-        Active
-      </label>
-    </div>
-
-    <button type="submit" [disabled]="loading">
-      {{ form.value.feeStructureId ? 'Update' : 'Add' }} Fee
-    </button>
-
-  </form>
-
-  <!-- Fee Structure List -->
-  <div class="student-list">
-    <h3>All Fee Structures</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Room Type</th>
-          <th>Amount</th>
-          <th>Description</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let f of list">
-          <td>{{ f.roomType }}</td>
-          <td>{{ f.amount }}</td>
-          <td>{{ f.description }}</td>
-          <td>{{ f.isActive ? 'Active' : 'Inactive' }}</td>
-          <td>
-            <button (click)="edit(f)">Edit</button>
-            <button (click)="delete(f.feeStructureId)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
   </div>
 
 </div>

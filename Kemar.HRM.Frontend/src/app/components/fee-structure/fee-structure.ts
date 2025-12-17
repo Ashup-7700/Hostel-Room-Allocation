@@ -10,13 +10,14 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   templateUrl: './fee-structure.html',
   styleUrls: ['./fee-structure.css']
 })
-export class FeeStructure implements OnInit {
+export class FeeStructureComponent implements OnInit {
 
   api = 'http://localhost:5027/api/FeeStructure';
+
   list: any[] = [];
   form!: FormGroup;
+  showModal = false;
   loading = false;
-  message = '';
 
   constructor(private fb: FormBuilder, private http: HttpClient) {}
 
@@ -24,8 +25,8 @@ export class FeeStructure implements OnInit {
     this.form = this.fb.group({
       feeStructureId: [0],
       roomType: ['', Validators.required],
-      amount: ['', Validators.required],
-      description: [''],
+      monthlyRent: [0, Validators.required],
+      securityDeposit: [0, Validators.required],
       isActive: [true]
     });
 
@@ -36,60 +37,92 @@ export class FeeStructure implements OnInit {
     return { Authorization: `Bearer ${localStorage.getItem('token')}` };
   }
 
+  // Load all Fee Structures
   load(): void {
-    this.loading = true;
-    this.http.get<any>(`${this.api}/getAll`, { headers: this.headers })
-      .subscribe({
-        next: res => {
-          this.list = res.data ?? [];
-          this.loading = false;
-        },
-        error: () => {
-          this.message = 'Failed to load fee structure';
-          this.loading = false;
-        }
-      });
+    this.http.post<any>(`${this.api}/filter`, {}, { headers: this.headers })
+      .subscribe(res => this.list = res?.data ?? []);
   }
 
+  // Open modal to add new
+  openAdd(): void {
+    this.form.reset({ feeStructureId: 0, isActive: true });
+    this.showModal = true;
+  }
+
+  // Open modal to edit existing
+  openEdit(data: any): void {
+    this.form.patchValue(data);
+    this.showModal = true;
+  }
+
+  // Close modal
+  close(): void {
+    this.showModal = false;
+    this.form.reset({ feeStructureId: 0 });
+  }
+
+  // Reset form
+  reset(): void {
+    this.form.reset({ feeStructureId: 0, isActive: true });
+  }
+
+  // Save or Update
   save(): void {
     if (this.form.invalid) return;
 
+    const payload = {
+      feeStructureId: this.form.value.feeStructureId || 0,
+      roomType: this.form.value.roomType,
+      monthlyRent: Number(this.form.value.monthlyRent),
+      securityDeposit: Number(this.form.value.securityDeposit),
+      isActive: this.form.value.isActive ?? true
+    };
+
     this.loading = true;
-    this.http.post(`${this.api}/addOrUpdate`, this.form.value, { headers: this.headers })
+    this.http.post(`${this.api}/addOrUpdate`, payload, { headers: this.headers })
       .subscribe({
         next: () => {
-          this.message = 'Fee structure saved successfully';
-          this.form.reset({ feeStructureId: 0, isActive: true });
+          this.loading = false;
+          this.close();
           this.load();
-          this.loading = false;
         },
-        error: () => {
-          this.message = 'Failed to save fee structure';
+        error: err => {
           this.loading = false;
+          console.error('Save error', err);
+          alert('Failed to save Fee Structure');
         }
       });
   }
 
-  edit(fee: any): void {
-    this.form.patchValue(fee);
-    window.scroll({ top: 0, behavior: 'smooth' });
-  }
-
+  // Delete Fee Structure
   delete(id: number): void {
-    if (!confirm('Are you sure you want to delete this fee structure?')) return;
+    if (!confirm('Delete this Fee Structure?')) return;
 
     this.loading = true;
-    this.http.delete(`${this.api}/delete/${id}`, { headers: this.headers })
+    this.http.delete(`${this.api}/${id}`, { headers: this.headers })
       .subscribe({
         next: () => {
-          this.message = 'Fee structure deleted successfully';
+          this.loading = false;
+          alert('Deleted successfully');
           this.load();
-          this.loading = false;
         },
-        error: () => {
-          this.message = 'Failed to delete fee structure';
+        error: err => {
           this.loading = false;
+          console.error('Delete failed', err);
+          alert('Delete failed');
         }
       });
   }
+
+  // View details
+  viewDetails(data: any): void {
+    alert(
+`Fee Structure Details:
+Room Type: ${data.roomType}
+Monthly Rent: ${data.monthlyRent}
+Security Deposit: ${data.securityDeposit}
+Status: ${data.isActive ? 'Active' : 'Inactive'}`
+    );
+  }
+
 }
