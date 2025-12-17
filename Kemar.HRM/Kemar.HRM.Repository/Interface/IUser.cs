@@ -14,4 +14,3 @@ namespace Kemar.HRM.Repository.Interface
         }
 
     }
-

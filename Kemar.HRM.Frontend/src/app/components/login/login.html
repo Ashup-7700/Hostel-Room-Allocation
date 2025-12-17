@@ -1,57 +1,83 @@
 <div class="h">
   <div class="container">
 
-  <h2>{{ isLoginMode ? 'Login' : 'Register' }}</h2>
+    <h2 *ngIf="!showForgot">
+      {{ isLoginMode ? 'Login' : 'Register' }}
+    </h2>
 
-  <p class="msg">{{ message }}</p>
+    <h2 *ngIf="showForgot">Forgot Username / Password</h2>
 
-  <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="login()">
-    <div class="form-group">
-      <label>Username</label>
-      <input formControlName="username" type="text" placeholder="Enter Username">
-    </div>
+    <p class="msg">{{ message }}</p>
 
-    <div class="form-group">
-      <label>Password</label>
-      <input formControlName="password" type="password" placeholder="Enter Password">
-    </div>
+    <!-- LOGIN -->
+    <form *ngIf="isLoginMode && !showForgot"
+          [formGroup]="loginForm"
+          (ngSubmit)="login()">
 
-    <button type="submit" [disabled]="loading">Login</button>
+      <div class="form-group">
+        <label>Username</label>
+        <input formControlName="username" type="text">
+      </div>
 
-    <p class="switch" (click)="toggleMode()">Don't have an account? Register</p>
-  </form>
+      <div class="form-group">
+        <label>Password</label>
+        <input formControlName="password" type="password">
+      </div>
 
-  <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="register()">
-    <div class="form-group">
-      <label>Full Name</label>
-      <input formControlName="fullName" type="text" placeholder="Enter Full Name">
-    </div>
+      <button type="submit" [disabled]="loading">Login</button>
 
-    <div class="form-group">
-      <label>Username</label>
-      <input formControlName="username" type="text" placeholder="Enter Username">
-    </div>
+      <p class="link" (click)="toggleForgot()">Forgot Username / Password?</p>
+      <p class="switch" (click)="toggleMode()">Don't have an account? Register</p>
+    </form>
 
-    <div class="form-group">
-      <label>Password</label>
-      <input formControlName="password" type="password" placeholder="Enter Password">
-    </div>
+    <!-- REGISTER -->
+    <form *ngIf="!isLoginMode && !showForgot"
+          [formGroup]="registerForm"
+          (ngSubmit)="register()">
 
-    <div class="form-group">
-      <label>Role</label>
-      <select formControlName="role">
-        <option value="">Select Role</option>
-        <option value="Admin">Admin</option>
-        <option value="Hostel Manager">Hostel Manager</option>
-        <option value="Warden">Warden</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input formControlName="fullName">
+      </div>
 
-    <button type="submit" [disabled]="loading">Register</button>
+      <div class="form-group">
+        <label>Username</label>
+        <input formControlName="username">
+      </div>
 
-    <p class="switch" (click)="toggleMode()">Already have an account? Login</p>
-  </form>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" formControlName="password">
+      </div>
 
-</div>
+      <div class="form-group">
+        <label>Role</label>
+        <select formControlName="role">
+          <option value="Admin">Admin</option>
+          <option value="Hostel Manager">Hostel Manager</option>
+          <option value="Warden">Warden</option>
+        </select>
+      </div>
 
+      <button type="submit" [disabled]="loading">Register</button>
+
+      <p class="switch" (click)="toggleMode()">Already have an account? Login</p>
+    </form>
+
+    <!-- FORGOT -->
+    <form *ngIf="showForgot"
+          [formGroup]="forgotForm"
+          (ngSubmit)="forgot()">
+
+      <div class="form-group">
+        <label>Email</label>
+        <input formControlName="email">
+      </div>
+
+      <button type="submit" [disabled]="loading">Recover</button>
+
+      <p class="switch" (click)="toggleForgot()">Back to Login</p>
+    </form>
+
+  </div>
 </div>

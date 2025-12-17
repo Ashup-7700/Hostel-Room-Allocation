@@ -23,13 +23,11 @@
         <td>{{ r.roomType }}</td>
         <td>{{ r.floor }}</td>
         <td>{{ r.capacity }}</td>
-
         <td>
           <span [class.active]="r.isActive" [class.inactive]="!r.isActive">
             {{ r.isActive ? 'Active' : 'Inactive' }}
           </span>
         </td>
-
         <td>
           <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(r)">✏️</button>
           <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(r)">👁</button>
@@ -63,7 +61,7 @@
         </div>
 
         <div class="actions">
-          <button class="save">Save</button>
+          <button class="save" [disabled]="loading">{{ loading ? 'Saving...' : 'Save' }}</button>
           <button type="button" class="reset" (click)="reset()">Reset</button>
           <button type="button" class="close" (click)="close()">Close</button>
         </div>

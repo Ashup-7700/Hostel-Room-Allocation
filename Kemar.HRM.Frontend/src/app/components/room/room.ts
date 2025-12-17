@@ -19,15 +19,15 @@ export class RoomComponent implements OnInit {
   showModal = false;
   loading = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private http: HttpClient) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
       roomId: [0],
       roomNumber: ['', Validators.required],
       roomType: ['', Validators.required],
-      floor: ['', Validators.required],
-      capacity: ['', Validators.required],
+      floor: [0, Validators.required],
+      capacity: [0, Validators.required],
       currentOccupancy: [0],
       isActive: [true]
     });
@@ -47,6 +47,10 @@ export class RoomComponent implements OnInit {
   openAdd(): void {
     this.form.reset({
       roomId: 0,
+      roomNumber: '',
+      roomType: '',
+      floor: 0,
+      capacity: 0,
       currentOccupancy: 0,
       isActive: true
     });
@@ -54,7 +58,15 @@ export class RoomComponent implements OnInit {
   }
 
   openEdit(data: any): void {
-    this.form.patchValue(data);
+    this.form.patchValue({
+      roomId: data.roomId,
+      roomNumber: data.roomNumber,
+      roomType: data.roomType,
+      floor: data.floor,
+      capacity: data.capacity,
+      currentOccupancy: data.currentOccupancy ?? 0,
+      isActive: data.isActive
+    });
     this.showModal = true;
   }
 
@@ -75,42 +87,64 @@ Status: ${data.isActive ? 'Active' : 'Inactive'}`
     this.form.reset();
   }
 
-
-    reset(): void {
-    this.form.reset({ roomId: 0, isActive: true });
+  reset(): void {
+    this.form.reset({
+      roomId: this.form.value.roomId || 0,
+      roomNumber: this.form.value.roomNumber || '',
+      roomType: this.form.value.roomType || '',
+      floor: this.form.value.floor || 0,
+      capacity: this.form.value.capacity || 0,
+      currentOccupancy: this.form.value.currentOccupancy || 0,
+      isActive: this.form.value.isActive ?? true
+    });
   }
 
   save(): void {
     if (this.form.invalid) return;
 
+    const payload = {
+      roomId: this.form.value.roomId || 0,
+      roomNumber: this.form.value.roomNumber,
+      roomType: this.form.value.roomType,
+      floor: Number(this.form.value.floor),
+      capacity: Number(this.form.value.capacity),
+      currentOccupancy: Number(this.form.value.currentOccupancy) || 0,
+      isActive: this.form.value.isActive ?? true
+    };
+
     this.loading = true;
-    this.http.post(`${this.api}/addOrUpdate`, this.form.value, { headers: this.headers })
+
+    this.http.post(`${this.api}/addOrUpdate`, payload, { headers: this.headers })
       .subscribe({
         next: () => {
           this.loading = false;
           this.close();
-          this.load();
+          this.load(); // refresh table
         },
-        error: () => this.loading = false
+        error: (err) => {
+          this.loading = false;
+          console.error('Save error', err);
+          alert('Save failed! Please check your data.');
+        }
       });
   }
+
   delete(id: number): void {
-  if (!confirm('Delete room?')) return;
+    if (!confirm('Delete room?')) return;
 
-  this.loading = true;
-  this.http.post(`${this.api}/delete/${id}`, { headers: this.headers })
-    .subscribe({
-      next: res => {
-        this.loading = false;
-        alert('Room deleted successfully'); 
-        this.load(); 
-      },
-      error: err => {
-        this.loading = false;
-        console.error('Delete failed', err);
-        alert('Delete failed');
-      }
-    });
-}
-
+    this.loading = true;
+    this.http.delete(`${this.api}/delete/${id}`, { headers: this.headers })
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          alert('Room deleted successfully');
+          this.load();
+        },
+        error: (err) => {
+          this.loading = false;
+          console.error('Delete failed', err);
+          alert('Delete failed!');
+        }
+      });
+  }
 }

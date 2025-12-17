@@ -1,33 +1,62 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login';
 import { DashboardComponent } from './components/dashboard/dashboard';
+import { AuthGuard } from './auth.guard';
+
 
 export const routes: Routes = [
 
+  // Default
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 
+  // 🔓 Public
   { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent },
 
-  { path: 'students', loadComponent: () =>
-      import('./components/student/student').then(m => m.StudentComponent)
+  // 🔒 Protected Layout
+  {
+    path: '',
+    canActivate: [AuthGuard],
+    children: [
+
+      { path: 'dashboard', component: DashboardComponent },
+
+      {
+        path: 'students',
+        loadComponent: () =>
+          import('./components/student/student')
+            .then(m => m.StudentComponent)
+      },
+
+      {
+        path: 'rooms',
+        loadComponent: () =>
+          import('./components/room/room')
+            .then(m => m.RoomComponent)
+      },
+
+      {
+        path: 'allocation',
+        loadComponent: () =>
+          import('./components/room-allocation/room-allocation')
+            .then(m => m.RoomAllocationComponent)
+      },
+
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./components/payment/payment')
+            .then(m => m.Payment)
+      },
+
+      {
+        path: 'fee-structure',
+        loadComponent: () =>
+          import('./components/fee-structure/fee-structure')
+            .then(m => m.FeeStructure)
+      }
+    ]
   },
 
-  { path: 'rooms', loadComponent: () =>
-      import('./components/room/room').then(m => m.RoomComponent)
-  },
-
-  { path: 'allocation', loadComponent: () =>
-      import('./components/room-allocation/room-allocation').then(m => m.RoomAllocationComponent)
-  },
-
-  { path: 'payments', loadComponent: () =>
-      import('./components/payment/payment').then(m => m.Payment)
-  },
-
-  { path: 'fee-structure', loadComponent: () =>
-      import('./components/fee-structure/fee-structure').then(m => m.FeeStructure)
-  },
-
+  // Fallback
   { path: '**', redirectTo: 'login' }
 ];
