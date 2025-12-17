@@ -19,7 +19,7 @@ export class RoomAllocationComponent implements OnInit {
   list: any[] = [];
   students: any[] = [];
   rooms: any[] = [];
-
+  
   form!: FormGroup;
   showModal = false;
   loading = false;
@@ -58,43 +58,59 @@ export class RoomAllocationComponent implements OnInit {
       });
   }
 
-//  students: any[] = [];
-
-loadStudents(): void {
-  this.http.get<any>(`${this.studentApi}/getAll`, {
-    headers: this.headers
-  }).subscribe({
-    next: res => {
+ loadStudents(): void {
+  this.http.get<any>(`${this.studentApi}/getAll`, { headers: this.headers })
+    .subscribe(res => {
+      console.log('Students API:', res.data);
       this.students = res.data ?? [];
-    },
-    error: err => {
-      console.error('Student load error', err);
-    }
-  });
+    });
 }
-
-
-
-
 
   loadRooms(): void {
     this.http.post<any>(`${this.roomApi}/getByFilter`, {}, { headers: this.headers })
       .subscribe(res => this.rooms = res.data ?? []);
   }
 
+  /* ===================== HELPER METHODS (✅ INSIDE CLASS) ===================== */
+
+getStudentName(studentId: number): string {
+  const s = this.students.find(x =>
+    x.studentId === studentId ||
+    x.studentID === studentId ||
+    x.id === studentId
+  );
+
+  return s?.studentName || s?.name || s?.fullName || '-';
+}
+
+
+  getRoomNumber(roomId: number): string {
+    return this.rooms.find(r => r.roomId === roomId)?.roomNumber ?? '-';
+  }
+
+viewDetails(data: any): void {
+  const studentName = this.getStudentName(data.studentId);
+  const roomNumber = this.getRoomNumber(data.roomId);
+
+  alert(
+`Room Allocation Details
+Student Name : ${studentName}
+Room Number  : ${roomNumber}
+Allocated At: ${data.allocatedAt ? new Date(data.allocatedAt).toISOString().split('T')[0] : '-'}
+Released At : ${data.releasedAt ? new Date(data.releasedAt).toISOString().split('T')[0] : '-'}
+Status      : ${data.isActive ? 'Active' : 'Released'}`
+  );
+}
+
   /* ===================== MODAL ===================== */
 
   openAdd(): void {
-    this.form.reset({
-      roomAllocationId: 0,
-      isActive: true
-    });
+    this.form.reset({ roomAllocationId: 0, isActive: true });
     this.showModal = true;
   }
 
   openEdit(data: any): void {
     this.showModal = true;
-
     this.form.patchValue({
       roomAllocationId: data.roomAllocationId,
       studentId: data.studentId,
@@ -109,20 +125,6 @@ loadStudents(): void {
     });
   }
 
-  viewDetails(data: any): void {
-    const student = this.students.find(s => s.studentId === data.studentId);
-    const room = this.rooms.find(r => r.roomId === data.roomId);
-
-    alert(
-`Room Allocation Details
-Student Name : ${student?.studentName ?? '-'}
-Room No      : ${room?.roomNumber ?? '-'}
-Allocated At: ${data.allocatedAt}
-Released At : ${data.releasedAt ?? '-'}
-Status      : ${data.isActive ? 'Active' : 'Released'}`
-    );
-  }
-
   close(): void {
     this.showModal = false;
     this.form.reset();
@@ -132,26 +134,20 @@ Status      : ${data.isActive ? 'Active' : 'Released'}`
     this.form.reset({ roomAllocationId: 0, isActive: true });
   }
 
-  /* ===================== SAVE / DELETE ===================== */
-
   save(): void {
     if (this.form.invalid) return;
 
     this.loading = true;
     this.http.post(`${this.api}/addOrUpdate`, this.form.value, { headers: this.headers })
-      .subscribe({
-        next: () => {
-          this.loading = false;
-          this.close();
-          this.load();
-        },
-        error: () => this.loading = false
+      .subscribe(() => {
+        this.loading = false;
+        this.close();
+        this.load();
       });
   }
 
   delete(id: number): void {
     if (!confirm('Delete allocation?')) return;
-
     this.http.delete(`${this.api}/Delete/${id}`, { headers: this.headers })
       .subscribe(() => this.load());
   }

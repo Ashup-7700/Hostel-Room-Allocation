@@ -2,44 +2,41 @@
 
   <div class="header">
     <h2>Payments</h2>
-    <button
-      class="add-btn"
-      (click)="openAdd()"
-      data-tooltip="Add Payment">
-      +
-    </button>
+    <button class="add-btn" (click)="openAdd()" data-tooltip="Add Payment">+</button>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>Student ID</th>
+        <th>Student Name</th>
         <th>Amount</th>
-        <th>Mode</th>
+        <th>Payment Mode</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
+
     <tbody>
       <tr *ngFor="let p of list">
-        <td>{{ p.studentId }}</td>
+        <td>{{ getStudentName(p.studentId) }}</td>
         <td>{{ p.amount }}</td>
         <td>{{ p.paymentMode }}</td>
+
         <td>
-          <span [class.active]="p.paymentStatus==='Paid'" [class.inactive]="p.paymentStatus!=='Paid'">
+          <span [class.active]="p.paymentStatus === 'Paid'" [class.inactive]="p.paymentStatus !== 'Paid'">
             {{ p.paymentStatus }}
           </span>
         </td>
+
         <td>
-          <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(p)">👁</button>
           <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(p)">✏️</button>
+          <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(p)">👁</button>
           <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(p.paymentId)">🗑</button>
         </td>
       </tr>
     </tbody>
   </table>
 
-  <!-- MODAL -->
   <div class="modal" *ngIf="showModal">
     <div class="modal-box">
 
@@ -47,17 +44,35 @@
 
       <form [formGroup]="form" (ngSubmit)="save()">
 
-        <label>Student ID <span>*</span></label>
-        <input type="number" formControlName="studentId">
+        <label>Student <span>*</span></label>
+        <select formControlName="studentId">
+          <option value="">-- Select Student --</option>
+          <option *ngFor="let s of students" [value]="s.studentId">
+            {{ s.name }}
+          </option>
+        </select>
+
 
         <label>Amount <span>*</span></label>
         <input type="number" formControlName="amount">
 
         <label>Payment Mode <span>*</span></label>
-        <input type="text" formControlName="paymentMode" placeholder="Cash / UPI">
+        <select formControlName="paymentMode">
+          <option value="">-- Select Mode --</option>
+          <option value="Cash">Cash</option>
+          <option value="UPI">UPI</option>
+          <option value="Card">Card</option>
+          <option value="NetBanking">Net Banking</option>
+        </select>
+
 
         <label>Status</label>
-        <input type="text" formControlName="paymentStatus" readonly>
+        <select formControlName="paymentStatus">
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+          <option value="Failed">Failed</option>
+        </select>
+
 
         <div class="actions">
           <button type="submit" class="save">Save</button>

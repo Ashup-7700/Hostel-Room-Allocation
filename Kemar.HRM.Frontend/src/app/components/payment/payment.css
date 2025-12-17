@@ -1,4 +1,31 @@
-/* ===== PAGE ===== */
+/* ===== SELECT (DROPDOWN) STYLE – ADD ONLY ===== */
+select {
+  width: 100%;
+  padding: 9px;
+  margin: 6px 0 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  font-size: 14px;
+  background-color: #fff;
+  color: #334155;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* Optional: disabled / readonly look */
+select:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+
+
+
+
 .page {
   padding: 24px;
   background: #f1f5f9;
@@ -6,7 +33,6 @@
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* ===== HEADER ===== */
 .header {
   display: flex;
   justify-content: space-between;
@@ -19,7 +45,6 @@
   color: #1e293b;
 }
 
-/* ===== ADD BUTTON ===== */
 .add-btn {
   position: relative;
   background: #2563eb;
@@ -38,7 +63,6 @@
   background: #1d4ed8;
 }
 
-/* ===== ADD BUTTON TOOLTIP ===== */
 .add-btn::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -74,7 +98,6 @@
   opacity: 1;
 }
 
-/* ===== TABLE ===== */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -157,7 +180,6 @@ tbody tr:hover {
   background: #b91c1c;
 }
 
-/* ===== ICON ACTION BUTTONS ===== */
 .icon-btn {
   background: transparent;
   border: none;
@@ -179,7 +201,6 @@ tbody tr:hover {
 .icon-btn.edit { color: #f59e0b; }
 .icon-btn.delete { color: #dc2626; }
 
-/* ===== ICON TOOLTIP ===== */
 .icon-btn::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -213,7 +234,6 @@ tbody tr:hover {
 .icon-btn:hover::after,
 .icon-btn:hover::before { opacity: 1; }
 
-/* ===== MODAL ===== */
 .modal {
   position: fixed;
   inset: 0;
@@ -269,8 +289,6 @@ input:focus {
 
 .actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
 }
 
 .actions button {
@@ -279,6 +297,7 @@ input:focus {
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  margin-right: 10px;
 }
 
 .save { background: #16a34a; color: #fff; }
