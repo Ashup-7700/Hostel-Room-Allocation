@@ -26,7 +26,12 @@ namespace Kemar.HRM.Repository.Repositories
             {
                 if (request.StudentId > 0)
                 {
-                    var student = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == request.StudentId);
+                    //var student = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == request.StudentId);
+
+                                    var student = await _context.Students
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(s => s.StudentId == request.StudentId);
+
                     if (student == null)
                         return ResultModel.NotFound("Student not found");
 
@@ -36,7 +41,7 @@ namespace Kemar.HRM.Repository.Repositories
                     student.Email = request.Email;
                     student.Address = request.Address;
                     student.DateOfAdmission = request.DateOfAdmission;
-                    student.IsActive = request.IsActive ?? student.IsActive;
+                    student.IsActive = request.IsActive;
                     student.UpdatedAt = DateTime.UtcNow;
                     student.UpdatedBy = loginUser;
 
@@ -73,20 +78,22 @@ namespace Kemar.HRM.Repository.Repositories
 
         public async Task<ResultModel> GetAllAsync()
         {
-            var students = await _context.Students.AsNoTracking().ToListAsync();
+            var students = await _context.Students.IgnoreQueryFilters().AsNoTracking().ToListAsync();
             var dto = _mapper.Map<List<StudentResponse>>(students);
             return ResultModel.Success(dto, "Student list fetched successfully");
         }
 
         public async Task<ResultModel> DeleteAsync(int studentId, string loginUser)
         {
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
+            var student = await _context.Students.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.StudentId == studentId);
             if (student == null)
                 return ResultModel.NotFound("Student not found");
 
-            student.IsActive = false;
-            student.UpdatedBy = loginUser;
-            student.UpdatedAt = DateTime.UtcNow;
+            //student.IsActive = false;
+            //student.UpdatedBy = loginUser;
+            //student.UpdatedAt = DateTime.UtcNow;
+
+            _context.Students.Remove(student);
 
             await _context.SaveChangesAsync();
             return ResultModel.Success(null, "Student deleted successfully");

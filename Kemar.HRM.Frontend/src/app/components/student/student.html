@@ -2,7 +2,27 @@
 
   <div class="header">
     <h2>Students</h2>
-    <button class="add-btn" data-tooltip="Add Student" (click)="openAdd()">+</button>
+
+    <div class="header-actions">
+      <!-- ✅ Status Filter -->
+      <select class="filter"
+              [(ngModel)]="filterStatus"
+              (change)="applyFilter()">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="name">Name</option>
+      </select>
+
+      <!-- ✅ Global Search -->
+      <input type="text"
+             class="search"
+             placeholder="Search students..."
+             [(ngModel)]="searchText"
+             (input)="applyFilter()">
+
+      <button class="add-btn" data-tooltip="Add Student" (click)="openAdd()">+</button>
+    </div>
   </div>
 
   <table>
@@ -12,8 +32,7 @@
         <th>Gender</th>
         <th>Phone</th>
         <th>Email</th>
-<th>Address</th>
-
+        <th>Address</th>
         <th>Admission Date</th>
         <th>Status</th>
         <th>Actions</th>
@@ -21,17 +40,17 @@
     </thead>
 
     <tbody>
-      <tr *ngFor="let s of list">
+      <tr *ngFor="let s of filteredList">
         <td>{{ s.name }}</td>
         <td>{{ s.gender }}</td>
         <td>{{ s.phone }}</td>
         <td>{{ s.email }}</td>
-<td>{{ s.address }}</td>
-
+        <td>{{ s.address }}</td>
         <td>{{ s.dateOfAdmission | date:'yyyy-MM-dd' }}</td>
 
         <td>
-          <span [class.active]="s.isActive" [class.inactive]="!s.isActive">
+          <span [class.active]="s.isActive"
+                [class.inactive]="!s.isActive">
             {{ s.isActive ? 'Active' : 'Inactive' }}
           </span>
         </td>
@@ -39,8 +58,13 @@
         <td>
           <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(s)">✏️</button>
           <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(s)">👁</button>
-          <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(s.studentId)">🗑</button>
+          <!-- <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(s.studentId)">🗑</button> -->
         </td>
+      </tr>
+
+      <!-- Empty State -->
+      <tr *ngIf="filteredList.length === 0">
+        <td colspan="8" class="no-data">No students found</td>
       </tr>
     </tbody>
   </table>
@@ -76,7 +100,7 @@
         </div>
 
         <div class="actions">
-          <button class="save">Save</button>
+          <button class="save" type="submit">Save</button>
           <button type="button" class="reset" (click)="reset()">Reset</button>
           <button type="button" class="close" (click)="close()">Close</button>
         </div>

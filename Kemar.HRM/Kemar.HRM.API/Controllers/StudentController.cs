@@ -21,7 +21,7 @@ namespace Kemar.HRM.API.Controllers
         private string LoggedInUser => User.FindFirstValue(ClaimTypes.Name) ?? "Unknown";
 
         [HttpPost("addOrUpdate")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> AddOrUpdateAsync([FromBody] StudentRequest request)
         {
             var result = await _studentManager.AddOrUpdateAsync(request, LoggedInUser);
@@ -45,7 +45,7 @@ namespace Kemar.HRM.API.Controllers
         }
 
         [HttpDelete("delete/{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _studentManager.DeleteAsync(id, LoggedInUser);

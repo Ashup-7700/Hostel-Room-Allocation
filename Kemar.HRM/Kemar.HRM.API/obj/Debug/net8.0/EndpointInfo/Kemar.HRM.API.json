@@ -933,8 +933,7 @@
             "format": "date-time"
           },
           "isActive": {
-            "type": "boolean",
-            "nullable": true
+            "type": "boolean"
           }
         },
         "additionalProperties": false

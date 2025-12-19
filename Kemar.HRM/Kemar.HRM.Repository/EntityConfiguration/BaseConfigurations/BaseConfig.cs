@@ -12,7 +12,7 @@ namespace Kemar.HRM.Repository.EntityConfiguration.BaseConfigurations
             builder.Property(b => b.UpdatedBy).HasMaxLength(50).IsRequired(false);
             builder.Property(b => b.CreatedAt).IsRequired();
             builder.Property(b => b.UpdatedAt).IsRequired(false);
-            builder.Property(b => b.IsActive).IsRequired();
+            builder.Property(b => b.IsActive).HasDefaultValue(true);
 
         }
     }

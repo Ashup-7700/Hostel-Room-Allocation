@@ -22,7 +22,7 @@ namespace Kemar.HRM.Model.Request
         public string Address { get; set; } = string.Empty;
         public DateTime DateOfAdmission { get; set; }
 
-        public bool? IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = true;
 
 
 

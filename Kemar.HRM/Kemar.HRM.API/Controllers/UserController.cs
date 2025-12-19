@@ -89,12 +89,16 @@ namespace Kemar.HRM.API.Controllers
 
         private string GenerateJwtToken(dynamic user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var jwtKey = _config["Jwt:Key"];
+            if (string.IsNullOrEmpty(jwtKey))
+                throw new Exception("JWT Key is missing in configuration");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), 
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
         new Claim(ClaimTypes.Name, user.Username),
         new Claim(ClaimTypes.Role, user.Role)
     };
@@ -109,6 +113,7 @@ namespace Kemar.HRM.API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
     }
 }

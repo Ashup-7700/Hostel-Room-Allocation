@@ -118,8 +118,9 @@ namespace Kemar.HRM.Repository.Repositories
         public async Task<User?> AuthenticateAsync(string username, string password)
         {
             var hashed = HashPassword(password);
-            return await _context.Users
+            var result = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username == username && u.Password == hashed && u.IsActive);
+            return result;
         }
 
         private string HashPassword(string password)
