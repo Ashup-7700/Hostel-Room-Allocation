@@ -11,7 +11,9 @@ namespace Kemar.HRM.Repository.Context
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public HostelDbContext(DbContextOptions<HostelDbContext> options, IHttpContextAccessor httpContextAccessor)
+        public HostelDbContext(
+            DbContextOptions<HostelDbContext> options,
+            IHttpContextAccessor httpContextAccessor)
             : base(options)
         {
             _httpContextAccessor = httpContextAccessor;
@@ -29,15 +31,23 @@ namespace Kemar.HRM.Repository.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            // 🔹 Global filters (Soft Delete)
             modelBuilder.Entity<Student>().HasQueryFilter(s => s.IsActive);
             modelBuilder.Entity<User>().HasQueryFilter(u => u.IsActive);
+            modelBuilder.Entity<Payment>().HasQueryFilter(p => p.IsActive);
+            modelBuilder.Entity<RoomAllocation>().HasQueryFilter(r => r.IsActive);
 
+            // 🔹 RoomAllocation → AllocatedByUser
             modelBuilder.Entity<RoomAllocation>()
                 .HasOne(r => r.AllocatedByUser)
                 .WithMany()
                 .HasForeignKey(r => r.AllocatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Payment>().Ignore(p => p.PaymentStatus);
+            modelBuilder.Entity<Payment>().Ignore(p => p.RemainingAmount);
+
+            // 🔹 Apply Configurations
             modelBuilder.ApplyConfiguration(new StudentConfig());
             modelBuilder.ApplyConfiguration(new RoomConfig());
             modelBuilder.ApplyConfiguration(new RoomAllocationConfig());
@@ -53,36 +63,38 @@ namespace Kemar.HRM.Repository.Context
             return base.SaveChanges();
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override Task<int> SaveChangesAsync(
+            CancellationToken cancellationToken = default)
         {
             AddAuditInfo();
             return base.SaveChangesAsync(cancellationToken);
         }
 
+        // 🔥 AUDIT LOGIC (FINAL & SAFE)
         private void AddAuditInfo()
         {
-            string currentUserRole = "Unknown";
+            string currentUserRole = "System";
             int? currentUserId = null;
 
             try
             {
-                var userClaims = _httpContextAccessor.HttpContext?.User;
+                var user = _httpContextAccessor.HttpContext?.User;
 
-                if (userClaims != null && userClaims.Identity.IsAuthenticated)
+                if (user?.Identity?.IsAuthenticated == true)
                 {
-                    var userIdClaim = userClaims.Claims
+                    var userIdClaim = user.Claims
                         .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
                     if (int.TryParse(userIdClaim, out int uid))
                         currentUserId = uid;
 
-                    currentUserRole = userClaims.Claims
-                        .FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "Unknown";
+                    currentUserRole = user.Claims
+                        .FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "System";
                 }
             }
             catch
             {
-                currentUserRole = "Unknown";
+                currentUserRole = "System";
                 currentUserId = null;
             }
 
@@ -90,38 +102,38 @@ namespace Kemar.HRM.Repository.Context
             {
                 bool isUserEntity = entry.Entity is User;
 
+                // ➕ INSERT
                 if (entry.State == EntityState.Added)
                 {
                     entry.Entity.CreatedAt = DateTime.UtcNow;
                     entry.Entity.IsActive = true;
                     entry.Entity.CreatedBy = isUserEntity ? "Admin" : currentUserRole;
 
-                    if (!isUserEntity)
+                    if (!isUserEntity && currentUserId.HasValue)
                     {
-                        var prop = entry.Entity.GetType().GetProperty("CreatedByUserId");
-                        if (prop != null)
-                            prop.SetValue(entry.Entity, currentUserId);
+                        var prop = entry.Entity.GetType()
+                            .GetProperty("CreatedByUserId");
+
+                        prop?.SetValue(entry.Entity, currentUserId);
                     }
 
                     entry.Entity.UpdatedAt = null;
                     entry.Entity.UpdatedBy = null;
-                    continue;
                 }
 
-                if (entry.State == EntityState.Modified)
+                // ✏️ UPDATE
+                else if (entry.State == EntityState.Modified)
                 {
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
                     entry.Entity.UpdatedBy = isUserEntity ? "Admin" : currentUserRole;
 
-                    
-                    if (currentUserId == null)
-                    {
-                        throw new UnauthorizedAccessException("User must be logged in to update records.");
-                    }
-                    continue;
+                    if (!isUserEntity && currentUserId == null)
+                        throw new UnauthorizedAccessException(
+                            "User must be logged in to update records.");
                 }
 
-                if (entry.State == EntityState.Deleted)
+                // ❌ SOFT DELETE
+                else if (entry.State == EntityState.Deleted)
                 {
                     entry.State = EntityState.Modified;
                     entry.Entity.IsActive = false;
@@ -130,7 +142,5 @@ namespace Kemar.HRM.Repository.Context
                 }
             }
         }
-
-
     }
 }

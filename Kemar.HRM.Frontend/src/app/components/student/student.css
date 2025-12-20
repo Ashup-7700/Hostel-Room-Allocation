@@ -24,6 +24,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  height: 48px;
+  width: 361px;
 }
 
 .header-actions .filter {
@@ -151,14 +153,14 @@ tbody tr:hover {
 }
 
 /* ===== COLUMN WIDTHS ===== */
-th:nth-child(1), td:nth-child(1) { width: 12%; }
-th:nth-child(2), td:nth-child(2) { width: 12%; }
-th:nth-child(3), td:nth-child(3) { width: 12%; }
-th:nth-child(4), td:nth-child(4) { width: 15%; }
-th:nth-child(5), td:nth-child(5) { width: 15%; }
-th:nth-child(6), td:nth-child(6) { width: 12%; }
-th:nth-child(7), td:nth-child(7) { width: 10%; }
-th:nth-child(8), td:nth-child(8) { width: 12%; }
+th:nth-child(1), td:nth-child(1) { width: 1%; }
+th:nth-child(2), td:nth-child(2) { width: 1%; }
+th:nth-child(3), td:nth-child(3) { width: 1%; }
+th:nth-child(4), td:nth-child(4) { width: 1%; }
+th:nth-child(5), td:nth-child(5) { width: 1%; }
+th:nth-child(6), td:nth-child(6) { width: 1%; }
+th:nth-child(7), td:nth-child(7) { width: 1%; }
+th:nth-child(8), td:nth-child(8) { width: 1%; }
 
 /* ===== STATUS BADGES ===== */
 .active {

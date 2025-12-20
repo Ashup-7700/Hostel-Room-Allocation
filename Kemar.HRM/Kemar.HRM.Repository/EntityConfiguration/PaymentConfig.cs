@@ -5,33 +5,47 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Kemar.HRM.Repository.EntityConfiguration
 {
-    internal class PaymentConfig : BaseEntityConfig<Payment>, IEntityTypeConfiguration<Payment>
+    internal class PaymentConfig
+        : BaseEntityConfig<Payment>, IEntityTypeConfiguration<Payment>
     {
         public override void Configure(EntityTypeBuilder<Payment> builder)
         {
             base.Configure(builder);
 
+            // 🔑 Primary Key
             builder.HasKey(p => p.PaymentId);
-            builder.Property(p => p.PaymentId).ValueGeneratedOnAdd();
 
+            builder.Property(p => p.PaymentId)
+                   .ValueGeneratedOnAdd();
 
-            builder.Property(p => p.Amount)
+            // 💰 Amounts
+            builder.Property(p => p.TotalAmount)
                    .IsRequired()
                    .HasColumnType("decimal(18,2)");
 
+            builder.Property(p => p.PaidAmount)
+                   .IsRequired()
+                   .HasColumnType("decimal(18,2)");
+
+            // 💳 Payment Mode
             builder.Property(p => p.PaymentMode)
-                   .IsRequired()
                    .HasMaxLength(50);
 
-            builder.Property(p => p.PaymentStatus)
-                   .IsRequired()
-                   .HasMaxLength(50);
+            // 📌 Payment Status (stored OR optional)
+            //builder.Property(p => p.PaymentStatus)
+            //       .IsRequired()
+            //       .HasMaxLength(50);
 
+            // 📅 Payment Date
             builder.Property(p => p.PaymentDate)
                    .IsRequired()
                    .HasDefaultValueSql("GETUTCDATE()");
 
-            // FINAL FIX → correct relationship
+            // 👤 Created By
+            builder.Property(p => p.CreatedByUserId)
+                   .IsRequired(false);
+
+            // 🔗 Relationship
             builder.HasOne(p => p.Student)
                    .WithMany(s => s.Payments)
                    .HasForeignKey(p => p.StudentId)

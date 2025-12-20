@@ -2,60 +2,74 @@
 
   <div class="header">
     <h2>Room Allocation</h2>
-    <button class="add-btn" (click)="openAdd()" data-tooltip="Add Room Allocation">
-      +
-    </button>
+
+    <div class="header-actions">
+      <!-- ✅ Status Filter -->
+      <select class="filter"
+              [(ngModel)]="filterStatus"
+              (change)="applyFilter()">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="inactive">Released</option>
+      </select>
+
+      <!-- ✅ Global Search -->
+      <input type="text"
+             class="search"
+             placeholder="Search room allocations..."
+             [(ngModel)]="searchText"
+             (input)="applyFilter()">
+
+      <button class="add-btn" data-tooltip="Allocate Room" (click)="openAdd()">+</button>
+    </div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>Student Name</th>
-        <th>Room Number</th>
-        <th>Allocated At</th>
-        <th>Released At</th>
+        <th>Student</th>
+        <th>Room</th>
+        <th>Allocated</th>
+        <th>Released</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr *ngFor="let a of list">
+      <tr *ngFor="let a of filteredList">
         <td>{{ getStudentName(a.studentId) }}</td>
         <td>{{ getRoomNumber(a.roomId) }}</td>
         <td>{{ a.allocatedAt | date:'yyyy-MM-dd' }}</td>
         <td>{{ a.releasedAt ? (a.releasedAt | date:'yyyy-MM-dd') : '-' }}</td>
 
         <td>
-          <span [class.active]="a.isActive" [class.inactive]="!a.isActive">
+          <span [class.active]="a.isActive"
+                [class.inactive]="!a.isActive">
             {{ a.isActive ? 'Active' : 'Released' }}
           </span>
         </td>
 
-        <td class="action-col">
-          <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(a)">
-            ✏️
-          </button>
-
-          <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(a)">
-            👁
-          </button>
-
-          <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(a.roomAllocationId)">
-            🗑
-          </button>
+        <td>
+          <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(a)">✏️</button>
+          <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(a)">👁</button>
+          <!-- <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(a.roomAllocationId)">🗑</button> -->
         </td>
+      </tr>
+
+      <!-- Empty State -->
+      <tr *ngIf="filteredList.length === 0">
+        <td colspan="6" class="no-data">No allocations found</td>
       </tr>
     </tbody>
   </table>
 
+  <!-- MODAL -->
   <div class="modal" *ngIf="showModal">
     <div class="modal-box">
-
       <h3>{{ form.value.roomAllocationId ? 'Update Allocation' : 'Allocate Room' }}</h3>
 
       <form [formGroup]="form" (ngSubmit)="save()">
-
 
         <label>Student <span>*</span></label>
         <select formControlName="studentId">
@@ -80,18 +94,23 @@
         <input type="date" formControlName="releasedAt">
 
         <div class="checkbox-row">
-          <label for="isActive">Active</label>
-          <input type="checkbox" id="isActive" formControlName="isActive">
+          <label>Active</label>
+          <input type="checkbox" formControlName="isActive">
         </div>
 
         <div class="actions">
-          <button type="submit" class="save">Save</button>
-          <button type="button" class="reset" (click)="reset()">Reset</button>
-          <button type="button" class="close" (click)="close()">Close</button>
+          <button class="save" type="submit">Save</button>
+          <button class="reset" type="button" (click)="reset()">Reset</button>
+          <button class="close" type="button" (click)="close()">Close</button>
         </div>
 
       </form>
     </div>
+  </div>
+
+  <!-- TOAST POPUP -->
+  <div class="toast" *ngIf="showToast">
+    {{ toastMessage }}
   </div>
 
 </div>

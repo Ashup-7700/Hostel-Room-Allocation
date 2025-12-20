@@ -744,7 +744,11 @@
             "type": "integer",
             "format": "int32"
           },
-          "amount": {
+          "totalAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "paidAmount": {
             "type": "number",
             "format": "double"
           },
@@ -768,6 +772,15 @@
           "createdBy": {
             "type": "string",
             "nullable": true
+          },
+          "updatedBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "remainingAmount": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -890,6 +903,9 @@
             "minimum": 0,
             "type": "integer",
             "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

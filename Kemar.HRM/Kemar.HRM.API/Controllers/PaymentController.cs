@@ -18,13 +18,15 @@ namespace Kemar.HRM.API.Controllers
         {
             _paymentManager = paymentManager;
         }
+
+        // ➕ ADD OR UPDATE PAYMENT
         [HttpPost("addOrUpdate")]
-        [Authorize]
         public async Task<IActionResult> AddOrUpdate([FromBody] PaymentRequest request)
         {
+            if (request == null)
+                return BadRequest("Request cannot be null");
 
-            int? currentUserId = null;
-
+            // Set current user info from claims
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             var username = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value ?? "System";
 
@@ -34,21 +36,22 @@ namespace Kemar.HRM.API.Controllers
                 request.CreatedBy = username;
             }
 
-
-
             var result = await _paymentManager.AddOrUpdateAsync(request);
             return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
-
-
+        // 🔍 GET PAYMENT BY ID
         [HttpGet("GetById/{paymentId}")]
         public async Task<IActionResult> GetByIdAsync(int paymentId)
         {
+            if (paymentId <= 0)
+                return BadRequest("Invalid PaymentId");
+
             var result = await _paymentManager.GetByIdAsync(paymentId);
             return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
+        // 📋 GET PAYMENTS BY FILTER
         [HttpPost("getByFilter")]
         public async Task<IActionResult> GetByFilterAsync([FromBody] PaymentFilter filter)
         {
@@ -59,9 +62,13 @@ namespace Kemar.HRM.API.Controllers
             return CommonHelper.ReturnActionResultByStatus(result, this);
         }
 
+        // ❌ DELETE PAYMENT (Soft Delete)
         [HttpDelete("delete/{paymentId:int}")]
         public async Task<IActionResult> DeleteAsync(int paymentId)
         {
+            if (paymentId <= 0)
+                return BadRequest("Invalid PaymentId");
+
             var username = HttpContext.User.Claims
                 .FirstOrDefault(c => c.Type == "username")?.Value ?? "System";
 
@@ -69,7 +76,4 @@ namespace Kemar.HRM.API.Controllers
             return CommonHelper.ReturnActionResultByStatus(result, this);
         }
     }
-
 }
-
-

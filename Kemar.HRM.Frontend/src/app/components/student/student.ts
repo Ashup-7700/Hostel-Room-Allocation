@@ -304,25 +304,25 @@ export class StudentComponent implements OnInit {
 
 
 
-delete(id: number): void {
-  if (!confirm('Are you sure you want to permanently delete this student?')) {
-    return;
-  }
+// delete(id: number): void {
+//   if (!confirm('Are you sure you want to permanently delete this student?')) {
+//     return;
+//   }
 
-  this.http.delete(`${this.api}/delete/${id}`, { headers: this.headers })
-    .subscribe({
-      next: () => {
-        // 🔥 REMOVE FROM MASTER LIST
-        this.list = this.list.filter((s: any) => s.studentId !== id);
+//   this.http.delete(`${this.api}/delete/${id}`, { headers: this.headers })
+//     .subscribe({
+//       next: () => {
+//         // 🔥 REMOVE FROM MASTER LIST
+//         this.list = this.list.filter((s: any) => s.studentId !== id);
 
-        // 🔥 UPDATE UI
-        this.applyFilter();
-      },
-      error: () => {
-        alert('Failed to permanently delete student');
-      }
-    });
-}
+//         // 🔥 UPDATE UI
+//         this.applyFilter();
+//       },
+//       error: () => {
+//         alert('Failed to permanently delete student');
+//       }
+//     });
+// }
 
 
   /* ================= VIEW ================= */

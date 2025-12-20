@@ -1,4 +1,4 @@
-<div class="page">
+<!-- <div class="page">
 
   <div class="header">
     <h2>Rooms</h2>
@@ -62,6 +62,156 @@
 
         <div class="actions">
           <button class="save" [disabled]="loading">{{ loading ? 'Saving...' : 'Save' }}</button>
+          <button type="button" class="reset" (click)="reset()">Reset</button>
+          <button type="button" class="close" (click)="close()">Close</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="page">
+
+  <div class="header">
+    <h2>Rooms</h2>
+
+    <div class="header-actions">
+      <!-- ✅ Status Filter -->
+      <select class="filter"
+              [(ngModel)]="filterStatus"
+              (change)="applyFilter()">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+
+      <!-- ✅ Global Search -->
+      <input type="text"
+             class="search"
+             placeholder="Search rooms..."
+             [(ngModel)]="searchText"
+             (input)="applyFilter()">
+
+      <button class="add-btn" data-tooltip="Add Room" (click)="openAdd()">+</button>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Room No</th>
+        <th>Type</th>
+        <th>Floor</th>
+        <th>Capacity</th>
+        <th>Occupancy</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let r of filteredList">
+        <td>{{ r.roomNumber }}</td>
+        <td>{{ r.roomType }}</td>
+        <td>{{ r.floor }}</td>
+        <td>{{ r.capacity }}</td>
+        <td>{{ r.currentOccupancy }}</td>
+
+        <td>
+          <span [class.active]="r.isActive"
+                [class.inactive]="!r.isActive">
+            {{ r.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+
+        <td>
+          <button class="icon-btn edit"
+                  data-tooltip="Edit"
+                  (click)="openEdit(r)">✏️</button>
+
+          <button class="icon-btn view"
+                  data-tooltip="View Details"
+                  (click)="viewDetails(r)">👁</button>
+
+          <!-- Optional delete -->
+          <!-- <button class="icon-btn delete"
+                  data-tooltip="Delete"
+                  (click)="delete(r.roomId)">🗑</button> -->
+        </td>
+      </tr>
+
+      <!-- Empty State -->
+      <tr *ngIf="filteredList.length === 0">
+        <td colspan="7" class="no-data">No rooms found</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- MODAL -->
+  <div class="modal" *ngIf="showModal">
+    <div class="modal-box">
+      <h3>{{ form.value.roomId ? 'Update Room' : 'Add Room' }}</h3>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+
+        <label>Room Number <span>*</span></label>
+        <input formControlName="roomNumber">
+
+        <label>Room Type <span>*</span></label>
+        <input formControlName="roomType">
+
+        <label>Floor <span>*</span></label>
+        <input type="number" formControlName="floor">
+
+        <label>Capacity <span>*</span></label>
+        <input type="number" formControlName="capacity">
+
+        <label>Current Occupancy</label>
+        <input type="number" formControlName="currentOccupancy">
+
+        <div class="checkbox-row">
+          <label>Active</label>
+          <input type="checkbox" formControlName="isActive">
+        </div>
+
+        <div class="actions">
+          <button class="save" type="submit">Save</button>
           <button type="button" class="reset" (click)="reset()">Reset</button>
           <button type="button" class="close" (click)="close()">Close</button>
         </div>

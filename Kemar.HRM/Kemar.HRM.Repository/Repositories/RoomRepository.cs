@@ -23,20 +23,30 @@ namespace Kemar.HRM.Repository.Repositories
         public async Task<ResultModel> AddOrUpdateAsync(RoomRequest request)
         {
             if (request.RoomId.HasValue && request.RoomId > 0)
-            {
-                var entity = await _context.Rooms
-                    .FirstOrDefaultAsync(r => r.RoomId == request.RoomId.Value);
 
-                if (entity == null)
+
+            {
+                //var room = await _context.Rooms
+                //    .FirstOrDefaultAsync(r => r.RoomId == request.RoomId.Value);
+
+
+
+                var room = await _context.Rooms
+                         .IgnoreQueryFilters()
+                         .FirstOrDefaultAsync(s => s.RoomId == request.RoomId);
+
+
+                if (room == null)
                     return ResultModel.NotFound("Room not found");
 
-                entity.RoomNumber = request.RoomNumber;
-                entity.RoomType = request.RoomType;
-                entity.Floor = request.Floor;
-                entity.Capacity = request.Capacity;
-                entity.CurrentOccupancy = request.CurrentOccupancy;
+                room.RoomNumber = request.RoomNumber;
+                room.RoomType = request.RoomType;
+                room.Floor = request.Floor;
+                room.Capacity = request.Capacity;
+                room.CurrentOccupancy = request.CurrentOccupancy;
+                room.IsActive = request.IsActive;
 
-                _context.Entry(entity).State = EntityState.Modified;
+                _context.Entry(room).State = EntityState.Modified;
 
                 await _context.SaveChangesAsync();
 

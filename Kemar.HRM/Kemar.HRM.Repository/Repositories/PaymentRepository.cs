@@ -4,7 +4,6 @@ using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
 using Kemar.HRM.Model.Response;
 using Kemar.HRM.Repository.Context;
-using Kemar.HRM.Repository.Entity;
 using Kemar.HRM.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +20,7 @@ namespace Kemar.HRM.Repository.Repositories
             _mapper = mapper;
         }
 
+        // ➕ ADD OR UPDATE PAYMENT
         public async Task<ResultModel> AddOrUpdateAsync(PaymentRequest request)
         {
             try
@@ -30,20 +30,26 @@ namespace Kemar.HRM.Repository.Repositories
                 if (request.PaymentId > 0)
                 {
                     entity = await _context.Payments
-                        .FirstOrDefaultAsync(p => p.PaymentId == request.PaymentId);
+                        .FirstOrDefaultAsync(p => p.PaymentId == request.PaymentId && p.IsActive);
 
                     if (entity == null)
                         return ResultModel.NotFound("Payment record not found.");
 
-                    _mapper.Map(request, entity);
+                    // Update PaidAmount and PaymentMode only
+                    entity.PaidAmount = request.PaidAmount;
+                    entity.PaymentMode = request.PaymentMode;
                     entity.UpdatedAt = DateTime.UtcNow;
+                    entity.UpdatedBy = request.UpdatedBy;
 
                     await _context.SaveChangesAsync();
-                    return ResultModel.Updated(_mapper.Map<PaymentResponse>(entity), "Payment updated successfully");
+
+                    return ResultModel.Updated(
+                        _mapper.Map<PaymentResponse>(entity),
+                        "Payment updated successfully");
                 }
                 else
                 {
-                    // Check if Student exists and is active
+                    // Student validation
                     var studentExists = await _context.Students
                         .AnyAsync(s => s.StudentId == request.StudentId && s.IsActive);
 
@@ -52,19 +58,25 @@ namespace Kemar.HRM.Repository.Repositories
 
                     entity = _mapper.Map<Payment>(request);
                     entity.CreatedAt = DateTime.UtcNow;
+                    entity.IsActive = true;
 
                     await _context.Payments.AddAsync(entity);
                     await _context.SaveChangesAsync();
 
-                    return ResultModel.Created(_mapper.Map<PaymentResponse>(entity), "Payment created successfully");
+                    return ResultModel.Created(
+                        _mapper.Map<PaymentResponse>(entity),
+                        "Payment created successfully");
                 }
             }
             catch (Exception ex)
             {
-                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
+                return ResultModel.Failure(
+                    ResultCode.ExceptionThrown,
+                    ex.InnerException?.Message ?? ex.Message);
             }
         }
 
+        // 🔍 GET BY PAYMENT ID
         public async Task<ResultModel> GetByIdAsync(int paymentId)
         {
             try
@@ -72,7 +84,7 @@ namespace Kemar.HRM.Repository.Repositories
                 var entity = await _context.Payments
                     .Include(p => p.Student)
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
+                    .FirstOrDefaultAsync(p => p.PaymentId == paymentId && p.IsActive);
 
                 if (entity == null)
                     return ResultModel.NotFound("Payment not found.");
@@ -81,39 +93,71 @@ namespace Kemar.HRM.Repository.Repositories
             }
             catch (Exception ex)
             {
-                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
+                return ResultModel.Failure(
+                    ResultCode.ExceptionThrown,
+                    ex.InnerException?.Message ?? ex.Message);
             }
         }
 
+        // 🔍 GET BY STUDENT ID
+        public async Task<ResultModel> GetByStudentIdAsync(int studentId)
+        {
+            try
+            {
+                var entity = await _context.Payments
+                    .Include(p => p.Student)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.StudentId == studentId && p.IsActive);
+
+                if (entity == null)
+                    return ResultModel.NotFound("Payment not found for student.");
+
+                return ResultModel.Success(_mapper.Map<PaymentResponse>(entity));
+            }
+            catch (Exception ex)
+            {
+                return ResultModel.Failure(
+                    ResultCode.ExceptionThrown,
+                    ex.InnerException?.Message ?? ex.Message);
+            }
+        }
+
+        // 📋 FILTER PAYMENTS
         public async Task<ResultModel> GetByFilterAsync(PaymentFilter filter)
         {
             try
             {
-                var query = _context.Payments.Include(p => p.Student).AsQueryable();
+                var query = _context.Payments
+                    .Include(p => p.Student)
+                    .Where(p => p.IsActive)
+                    .AsQueryable();
 
-                if (filter.StudentId.HasValue && filter.StudentId.Value > 0)
+                if (filter.StudentId.HasValue)
                     query = query.Where(p => p.StudentId == filter.StudentId.Value);
 
-                if (!string.IsNullOrEmpty(filter.PaymentStatus))
+                if (!string.IsNullOrWhiteSpace(filter.PaymentStatus))
                     query = query.Where(p => p.PaymentStatus == filter.PaymentStatus);
 
                 var list = await query.AsNoTracking().ToListAsync();
-                var mappedList = _mapper.Map<List<PaymentResponse>>(list);
 
-                return ResultModel.Success(mappedList);
+                return ResultModel.Success(
+                    _mapper.Map<List<PaymentResponse>>(list));
             }
             catch (Exception ex)
             {
-                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
+                return ResultModel.Failure(
+                    ResultCode.ExceptionThrown,
+                    ex.InnerException?.Message ?? ex.Message);
             }
         }
 
+        // ❌ SOFT DELETE
         public async Task<ResultModel> DeleteAsync(int paymentId, string deletedBy)
         {
             try
             {
                 var entity = await _context.Payments
-                    .FirstOrDefaultAsync(p => p.PaymentId == paymentId);
+                    .FirstOrDefaultAsync(p => p.PaymentId == paymentId && p.IsActive);
 
                 if (entity == null)
                     return ResultModel.NotFound("Payment not found.");
@@ -128,8 +172,17 @@ namespace Kemar.HRM.Repository.Repositories
             }
             catch (Exception ex)
             {
-                return ResultModel.Failure(ResultCode.ExceptionThrown, ex.InnerException?.Message ?? ex.Message);
+                return ResultModel.Failure(
+                    ResultCode.ExceptionThrown,
+                    ex.InnerException?.Message ?? ex.Message);
             }
         }
     }
+
 }
+
+    //entity.PaymentStatus = entity.PaidAmount >= entity.TotalAmount? "Completed" : "Pending";
+
+
+
+//entity.PaymentStatus = entity.PaidAmount >= entity.TotalAmount ? "Completed" : "Pending";

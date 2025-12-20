@@ -2,76 +2,114 @@
 using Kemar.HRM.Model.Common;
 using Kemar.HRM.Model.Filter;
 using Kemar.HRM.Model.Request;
-using Kemar.HRM.Model.Response;
 using Kemar.HRM.Repository.Interface;
 
-namespace Kemar.HRM.Business
+namespace Kemar.HRM.Business.PaymentBusiness
 {
     public class PaymentManager : IPaymentManager
     {
         private readonly IPaymentRepository _paymentRepository;
-        private static readonly string[] ValidStatuses = { "Pending", "Completed", "Failed" };
 
         public PaymentManager(IPaymentRepository paymentRepository)
         {
             _paymentRepository = paymentRepository;
         }
 
+        // ➕ ADD / UPDATE PAYMENT
         public async Task<ResultModel> AddOrUpdateAsync(PaymentRequest request)
         {
             if (request.StudentId <= 0)
-                return ResultModel.Failure(message: "Invalid StudentId");
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid StudentId");
 
-            if (request.Amount <= 0)
-                return ResultModel.Failure(message: "Payment amount must be greater than zero");
+            if (request.PaidAmount < 0)
+                return ResultModel.Failure(ResultCode.Invalid, "Paid amount must be greater than or equal to zero");
 
             if (string.IsNullOrWhiteSpace(request.PaymentMode))
-                return ResultModel.Failure(message: "Payment mode is required");
+                return ResultModel.Failure(ResultCode.Invalid, "Payment mode is required");
 
-            if (string.IsNullOrWhiteSpace(request.PaymentStatus) || !ValidStatuses.Contains(request.PaymentStatus))
-                return ResultModel.Failure(message: $"PaymentStatus must be one of: {string.Join(", ", ValidStatuses)}");
+            if (request.TotalAmount <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "Total amount must be provided and greater than zero");
 
-            // Check for duplicate payment
-            var filter = new PaymentFilter { StudentId = request.StudentId };
-            var existingPaymentsResult = await _paymentRepository.GetByFilterAsync(filter);
+            // 🔹 Calculate PaymentStatus (RemainingAmount is auto-calculated in PaymentResponse)
+            request.PaymentStatus = (request.TotalAmount - request.PaidAmount) <= 0 ? "Completed" : "Pending";
 
-            if (existingPaymentsResult.IsSuccess && existingPaymentsResult.Data is List<PaymentResponse> existingPayments)
+            // Save or update payment
+            var result = await _paymentRepository.AddOrUpdateAsync(request);
+
+            // Only set PaymentStatus in response if applicable
+            if (result?.Data != null)
             {
-                if (request.PaymentId == 0) 
-                {
-                    var duplicate = existingPayments
-                        .FirstOrDefault(p => p.PaymentDate.Date == request.PaymentDate.Date &&
-                                             p.PaymentStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase));
-
-                    if (duplicate != null)
-                        return ResultModel.Failure(message: "Payment for this student already exists for the given date");
-                }
+                dynamic payment = result.Data;
+                payment.PaymentStatus = (payment.TotalAmount - payment.PaidAmount) <= 0 ? "Completed" : "Pending";
+                // ❌ DO NOT assign RemainingAmount (read-only)
             }
 
-            // Add or Update
-            return await _paymentRepository.AddOrUpdateAsync(request);
+            return result;
         }
 
+        // 🔍 GET PAYMENT BY ID
         public async Task<ResultModel> GetByIdAsync(int paymentId)
         {
             if (paymentId <= 0)
-                return ResultModel.Failure(message: "Invalid PaymentId");
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid PaymentId");
 
-            return await _paymentRepository.GetByIdAsync(paymentId);
+            var result = await _paymentRepository.GetByIdAsync(paymentId);
+
+            if (result?.Data != null)
+            {
+                dynamic payment = result.Data;
+                payment.PaymentStatus = (payment.TotalAmount - payment.PaidAmount) <= 0 ? "Completed" : "Pending";
+                // ❌ DO NOT assign RemainingAmount
+            }
+
+            return result;
         }
 
+        // 🔍 GET PAYMENTS BY STUDENT ID
+        public async Task<ResultModel> GetByStudentIdAsync(int studentId)
+        {
+            if (studentId <= 0)
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid StudentId");
+
+            var result = await _paymentRepository.GetByStudentIdAsync(studentId);
+
+            if (result?.Data is IEnumerable<dynamic> payments)
+            {
+                foreach (var payment in payments)
+                {
+                    payment.PaymentStatus = (payment.TotalAmount - payment.PaidAmount) <= 0 ? "Completed" : "Pending";
+                    // ❌ DO NOT assign RemainingAmount
+                }
+            }
+
+            return result;
+        }
+
+        // 📋 FILTER PAYMENTS
         public async Task<ResultModel> GetByFilterAsync(PaymentFilter filter)
         {
             if (filter == null)
-                return ResultModel.Failure(message: "Filter is required");
+                return ResultModel.Failure(ResultCode.Invalid, "Filter is required");
 
-            return await _paymentRepository.GetByFilterAsync(filter);
+            var result = await _paymentRepository.GetByFilterAsync(filter);
+
+            if (result?.Data is IEnumerable<dynamic> payments)
+            {
+                foreach (var payment in payments)
+                {
+                    payment.PaymentStatus = (payment.TotalAmount - payment.PaidAmount) <= 0 ? "Completed" : "Pending";
+                    // ❌ DO NOT assign RemainingAmount
+                }
+            }
+
+            return result;
         }
 
+        // ❌ SOFT DELETE PAYMENT
         public async Task<ResultModel> DeleteAsync(int paymentId, string deletedBy)
         {
             if (paymentId <= 0)
-                return ResultModel.Failure(message: "Invalid PaymentId");
+                return ResultModel.Failure(ResultCode.Invalid, "Invalid PaymentId");
 
             if (string.IsNullOrWhiteSpace(deletedBy))
                 deletedBy = "System";

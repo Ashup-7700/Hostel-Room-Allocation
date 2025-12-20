@@ -1,7 +1,7 @@
 ﻿using Kemar.HRM.API.AutoMapper;
-using Kemar.HRM.Business;
 using Kemar.HRM.Business.FeeStructureBusiness;
 using Kemar.HRM.Business.Interface;
+using Kemar.HRM.Business.PaymentBusiness;
 using Kemar.HRM.Business.RoomAllocationBusiness;
 using Kemar.HRM.Business.RoomBusiness;
 using Kemar.HRM.Business.StudentBusiness;

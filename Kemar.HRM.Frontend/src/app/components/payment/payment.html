@@ -2,14 +2,36 @@
 
   <div class="header">
     <h2>Payments</h2>
-    <button class="add-btn" (click)="openAdd()" data-tooltip="Add Payment">+</button>
+
+    <div class="header-actions">
+      <!-- ✅ Status Filter -->
+      <select class="filter"
+              [(ngModel)]="filterStatus"
+              (change)="applyFilter()">
+        <option value="all">All</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+      </select>
+
+      <!-- ✅ Global Search -->
+      <input type="text"
+             class="search"
+             placeholder="Search payments..."
+             [(ngModel)]="searchText"
+             (input)="applyFilter()">
+
+      <button class="add-btn" data-tooltip="Add Payment" (click)="openAdd()">+</button>
+    </div>
   </div>
 
+  <!-- Payments Table -->
   <table>
     <thead>
       <tr>
         <th>Student Name</th>
-        <th>Amount</th>
+        <th>Paid Amount</th>
+        <th>Total Amount</th>
+        <th>Remaining Amount</th>
         <th>Payment Mode</th>
         <th>Status</th>
         <th>Actions</th>
@@ -17,45 +39,60 @@
     </thead>
 
     <tbody>
-      <tr *ngFor="let p of list">
+      <tr *ngFor="let p of filteredList">
         <td>{{ getStudentName(p.studentId) }}</td>
-        <td>{{ p.amount }}</td>
+        <td>{{ p.paidAmount }}</td>
+        <td>{{ p.totalAmount }}</td>
+        <td>{{ getRemainingAmount(p) }}</td>
         <td>{{ p.paymentMode }}</td>
-
         <td>
-          <span [class.active]="p.paymentStatus === 'Paid'" [class.inactive]="p.paymentStatus !== 'Paid'">
-            {{ p.paymentStatus }}
+          <span [class.completed]="getPaymentStatus(p) === 'Completed'"
+                [class.pending]="getPaymentStatus(p) === 'Pending'">
+            {{ getPaymentStatus(p) }}
           </span>
         </td>
-
         <td>
           <button class="icon-btn edit" data-tooltip="Edit" (click)="openEdit(p)">✏️</button>
           <button class="icon-btn view" data-tooltip="View Details" (click)="viewDetails(p)">👁</button>
-          <button class="icon-btn delete" data-tooltip="Delete" (click)="delete(p.paymentId)">🗑</button>
         </td>
+      </tr>
+
+      <!-- Empty State -->
+      <tr *ngIf="filteredList.length === 0">
+        <td colspan="7" class="no-data">No payments found</td>
       </tr>
     </tbody>
   </table>
 
+  <!-- MODAL -->
   <div class="modal" *ngIf="showModal">
     <div class="modal-box">
-
       <h3>{{ form.value.paymentId ? 'Update Payment' : 'Add Payment' }}</h3>
 
       <form [formGroup]="form" (ngSubmit)="save()">
 
-        <label>Student <span>*</span></label>
-        <select formControlName="studentId">
-          <option value="">-- Select Student --</option>
-          <option *ngFor="let s of students" [value]="s.studentId">
-            {{ s.name }}
-          </option>
-        </select>
+        <!-- Student Selection -->
+      <!-- Student Selection -->
+<label>Student <span>*</span></label>
+<select formControlName="studentId" #studentSelect (change)="onStudentChange(studentSelect.value)">
+  <option value="">-- Select Student --</option>
+  <option *ngFor="let s of students" [value]="s.studentId">{{ s.name }}</option>
+</select>
 
 
-        <label>Amount <span>*</span></label>
-        <input type="number" formControlName="amount">
+        <!-- Paid Amount -->
+        <label>Paid Amount <span>*</span></label>
+        <input type="number" formControlName="paidAmount">
 
+        <!-- Total Amount (read-only) -->
+        <label>Total Amount <span>*</span></label>
+<input type="number" formControlName="totalAmount" required>
+
+        <!-- Remaining Amount (read-only) -->
+        <label>Remaining Amount</label>
+        <input type="number" [value]="form.value.totalAmount - form.value.paidAmount" readonly>
+
+        <!-- Payment Mode -->
         <label>Payment Mode <span>*</span></label>
         <select formControlName="paymentMode">
           <option value="">-- Select Mode --</option>
@@ -65,15 +102,7 @@
           <option value="NetBanking">Net Banking</option>
         </select>
 
-
-        <label>Status</label>
-        <select formControlName="paymentStatus">
-          <option value="Pending">Pending</option>
-          <option value="Completed">Completed</option>
-          <option value="Failed">Failed</option>
-        </select>
-
-
+        <!-- Modal Actions -->
         <div class="actions">
           <button type="submit" class="save">Save</button>
           <button type="button" class="reset" (click)="reset()">Reset</button>

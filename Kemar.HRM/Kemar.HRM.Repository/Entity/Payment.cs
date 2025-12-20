@@ -1,23 +1,24 @@
-﻿using Kemar.HRM.Repository.Entity.BaseEntities;
+﻿using Kemar.HRM.Repository.Entity;
+using Kemar.HRM.Repository.Entity.BaseEntities;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Kemar.HRM.Repository.Entity
+public class Payment : BaseEntity
 {
-    public class Payment : BaseEntity
-    {
-        public int PaymentId { get; set; }
+    public int PaymentId { get; set; }
 
-        public int StudentId { get; set; }
-        public Student? Student { get; set; }
+    public int StudentId { get; set; }
+    public Student? Student { get; set; }
 
-        public decimal Amount { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal PaidAmount { get; set; }
 
-        public string PaymentMode { get; set; } = string.Empty;
+    [NotMapped]
+    public decimal RemainingAmount => TotalAmount - PaidAmount;
 
-        public string PaymentStatus { get; set; } = string.Empty;
+    [NotMapped]
+    public string PaymentStatus => PaidAmount >= TotalAmount ? "Completed" : "Pending";
 
-        public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
-
-        public int? CreatedByUserId { get; set; }
-
-    }
+    public string PaymentMode { get; set; } = string.Empty;
+    public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
+    public int? CreatedByUserId { get; set; }
 }

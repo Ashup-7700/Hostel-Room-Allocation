@@ -11,7 +11,6 @@ namespace Kemar.HRM.API.AutoMapper
         {
             #region Student
             CreateMap<StudentRequest, Student>();
-
             CreateMap<Student, StudentResponse>();
             #endregion
 
@@ -29,26 +28,13 @@ namespace Kemar.HRM.API.AutoMapper
 
             #region RoomAllocation
             CreateMap<RoomAllocationRequest, RoomAllocation>()
-              .ForMember(dest => dest.RoomAllocationId, opt => opt.MapFrom(src => src.RoomAllocationId))
-              .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.StudentId))
-              .ForMember(dest => dest.RoomId, opt => opt.MapFrom(src => src.RoomId))
-              .ForMember(dest => dest.ReleasedAt, opt => opt.MapFrom(src => src.ReleasedAt))
+                .ForMember(dest => dest.RoomAllocationId, opt => opt.Ignore())
+                .ForMember(dest => dest.AllocatedByUser, opt => opt.Ignore());
 
-
-             .ForMember(dest => dest.RoomAllocationId, opt => opt.Ignore())
-            .ForMember(dest => dest.AllocatedByUser, opt => opt.Ignore());
             CreateMap<RoomAllocation, RoomAllocationResponse>()
-                .ForMember(dest => dest.RoomAllocationId, opt => opt.MapFrom(src => src.RoomAllocationId))
-                .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.StudentId))
-                .ForMember(dest => dest.RoomId, opt => opt.MapFrom(src => src.RoomId))
-                .ForMember(dest => dest.AllocatedAt, opt => opt.MapFrom(src => src.AllocatedAt))
-                .ForMember(dest => dest.ReleasedAt, opt => opt.MapFrom(src => src.ReleasedAt))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
                 .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student != null ? src.Student.Name : string.Empty))
                 .ForMember(dest => dest.RoomNumber, opt => opt.MapFrom(src => src.Room != null ? src.Room.RoomNumber : string.Empty))
                 .ForMember(dest => dest.AllocatedByUsername, opt => opt.MapFrom(src => src.AllocatedByUser != null ? src.AllocatedByUser.Username : string.Empty));
-
-
             #endregion
 
             #region User
@@ -70,13 +56,13 @@ namespace Kemar.HRM.API.AutoMapper
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.Student, opt => opt.Ignore());
 
-                .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.StudentId))
-                .ForMember(dest => dest.Student, opt => opt.Ignore()); 
+            CreateMap<Payment, PaymentResponse>()
+     .ForMember(dest => dest.RemainingAmount, opt => opt.MapFrom(src => src.TotalAmount - src.PaidAmount))
+     .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus));
 
-            CreateMap<Payment, PaymentResponse>();
             #endregion
-
 
             #region FeeStructure
             CreateMap<FeeStructureRequest, FeeStructure>()
